@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>我的大学工作台</title>
+<style>
+:root{
+  --bg:#EDF2F6; --card:#FFFFFF; --ink:#2A3038; --ink-2:#5C6875;
+  --blue-50:#F3F7FA; --blue-100:#DCE6EE; --blue-200:#A9BBCB; --blue-300:#8399B0;
+  --blue-500:#5B7591; --blue-700:#3E4C64; --blue-900:#2C3A4E;
+  --line:#DCE4EB; --ok:#4E7A68; --danger:#A55C5C;
+  --r:18px; --shadow:0 2px 14px rgba(62,76,100,.07);
+  --serif:"SimSun","Songti SC","STSong","Noto Serif CJK SC","Source Han Serif SC",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+  font-size:15px; line-height:1.7;
+  background-image:radial-gradient(circle,rgba(62,76,100,.045) 1px,transparent 1px);
+  background-size:24px 24px;
+}
+h1,h2,h3,h4,p,ul,ol{margin:0}
+ul,ol{padding:0;list-style:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.42}
+:focus-visible{outline:3px solid var(--blue-500);outline-offset:2px}
+.serif{font-family:var(--serif);font-weight:700}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+[hidden]{display:none!important}
+
+/* 布局 */
+.app{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh;max-width:1440px;margin:0 auto}
+.sidebar{
+  position:sticky;top:0;height:100vh;display:flex;flex-direction:column;
+  padding:28px 18px;background:rgba(255,255,255,.72);border-right:1px solid var(--line);
+  backdrop-filter:blur(6px);
+}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px 22px}
+.brand-mark{
+  width:38px;height:38px;flex:none;display:grid;place-items:center;border-radius:10px;
+  background:var(--blue-300);color:#1F2730;font-family:var(--serif);font-size:20px;
+  transform:rotate(-3deg);box-shadow:2px 3px 0 rgba(62,76,100,.12);
+}
+.brand strong{display:block;font-family:var(--serif);font-size:17px;line-height:1.4}
+.brand small{display:block;color:var(--ink-2);font-size:12px;line-height:1.5}
+.nav{display:flex;flex-direction:column;gap:6px;overflow-y:auto;padding:4px 0}
+.nav-btn{
+  width:100%;text-align:left;border:0;background:transparent;color:var(--ink-2);
+  padding:10px 14px;border-radius:12px;font-size:14px;transition:background .2s,color .2s,transform .2s;
+}
+.nav-btn:hover{background:var(--blue-50);color:var(--blue-700)}
+.nav-btn.active{background:var(--blue-700);color:#fff;font-weight:600}
+.sidebar-foot{margin-top:auto;padding-top:16px}
+.main{min-width:0;padding:0 32px 64px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:32px 0 24px}
+.eyebrow{color:var(--ink-2);font-size:13px;letter-spacing:.02em}
+.page-title{
+  display:inline-block;margin-top:8px;padding:5px 18px 7px;border-radius:12px;
+  background:var(--blue-300);color:#1F2730;font-family:var(--serif);font-size:26px;line-height:1.4;
+}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.badge{background:var(--blue-100);color:var(--blue-900);border-radius:999px;padding:5px 14px;font-size:12px;white-space:nowrap}
+#modeBtnTop{display:none}
+.view{max-width:980px}
+
+/* 卡片 */
+.card{background:var(--card);border:1px solid rgba(220,228,235,.9);border-radius:var(--r);box-shadow:var(--shadow);padding:24px 26px;margin-bottom:20px}
+.card-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.card-head h2{font-size:20px;display:flex;align-items:center;gap:10px}
+.card-head h2::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--blue-300);flex:none}
+.card-note{color:var(--ink-2);font-size:12px}
+.muted{color:var(--ink-2);font-size:13px}
+.small{font-size:12px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.greeting-card{background:linear-gradient(120deg,#fff 0%,var(--blue-50) 100%)}
+.greeting-line{font-family:var(--serif);font-size:24px;line-height:1.5}
+.greeting-sub{color:var(--ink-2);font-size:13px;margin-top:6px}
+
+/* 三件事 */
+.task-row{display:flex;align-items:flex-start;gap:12px;padding:11px 2px;border-bottom:1px dashed var(--line);cursor:pointer}
+.task-row:last-child{border-bottom:0}
+.task-row.is-empty{cursor:default}
+.task-row input{position:absolute;width:1px;height:1px;opacity:0}
+.task-box{width:20px;height:20px;flex:none;margin-top:3px;border:2px solid var(--blue-300);border-radius:6px;background:#fff;position:relative;transition:background .2s,border-color .2s}
+.task-row input:checked+.task-box{background:var(--blue-700);border-color:var(--blue-700)}
+.task-row input:checked+.task-box::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:13px;line-height:1}
+.task-row input:focus-visible+.task-box{outline:3px solid var(--blue-500);outline-offset:2px}
+.task-text{flex:1;min-width:0;word-break:break-word}
+.task-text.done{color:var(--ink-2);text-decoration:line-through}
+.is-empty .task-box{opacity:.45}
+.is-empty .task-text{color:var(--ink-2)}
+.card-actions{margin-top:14px}
+
+/* 数字 / 倒计时 */
+.stat-num{font-family:var(--serif);font-size:44px;line-height:1.2;color:var(--blue-900)}
+.stat-num .unit{font-family:var(--sans);font-size:15px;margin-left:6px;color:var(--ink-2)}
+.stat-label{color:var(--ink-2);font-size:13px;margin-top:4px}
+.cd-title{font-family:var(--serif);font-size:18px;margin-bottom:10px}
+.list-plain li{display:flex;align-items:baseline;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);flex-wrap:wrap}
+.list-plain li:last-child{border-bottom:0}
+.future-thing{flex:1;min-width:140px}
+.chip{background:var(--blue-50);border:1px solid var(--blue-100);color:var(--blue-700);border-radius:999px;padding:2px 10px;font-size:12px;white-space:nowrap}
+.future-date{color:var(--ink-2);font-size:12px;white-space:nowrap;margin-left:auto}
+.empty-hint{padding:14px 0;color:var(--ink-2);font-size:13px}
+.stat-num.word{font-size:25px;line-height:1.5;color:var(--blue-700)}
+.empty-state{padding:6px 0 2px;color:var(--ink-2);font-size:14px}
+.empty-state p{margin-bottom:4px}
+.empty-state .btn{margin-top:10px}
+.sched-split{display:flex;align-items:center;gap:10px;padding:16px 0 8px;color:var(--ink-2);font-size:12px}
+.sched-split::after{content:"";flex:1;border-top:1px dashed var(--line)}
+.sched-date.is-past{opacity:.7}
+
+/* 目标冲刺 */
+.prog-item{padding:14px 0;border-bottom:1px dashed var(--line)}
+.prog-item:last-child{border-bottom:0}
+.prog-top{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.prog-name{font-weight:600}
+.prog-pct{color:var(--blue-700);font-size:13px;font-variant-numeric:tabular-nums}
+.prog-track{height:8px;border-radius:999px;background:var(--blue-100);overflow:hidden;margin:8px 0 6px}
+.prog-track span{display:block;height:100%;border-radius:999px;background:var(--blue-500)}
+.prog-note{color:var(--ink-2);font-size:13px}
+.note{padding:12px 0;border-bottom:1px dashed var(--line)}
+.note:last-child{border-bottom:0}
+.note-date{color:var(--blue-700);font-size:12px;margin-bottom:4px}
+.note p{white-space:pre-wrap;word-break:break-word}
+.sub{font-family:var(--serif);font-size:16px;margin:22px 0 10px;padding-top:14px;border-top:1px dashed var(--line)}
+
+/* 日程 */
+.sched-row{display:grid;grid-template-columns:20px minmax(0,1fr) auto auto;align-items:center;gap:12px;padding:13px 0;border-bottom:1px dashed var(--line)}
+.sched-row:last-child{border-bottom:0}
+.sched-thing{min-width:0;word-break:break-word}
+.sched-date{color:var(--ink-2);font-size:12px;white-space:nowrap;text-align:right}
+.sched-date.is-tbd{color:var(--ink-2);font-style:normal}
+
+/* 打卡：可横滑的连续时间轴 */
+.tl-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:2px 0 12px}
+.tl-toolbar .btn{min-height:34px}
+.tl-scroll{
+  position:relative;overflow-x:auto;overflow-y:hidden;border:1px solid var(--line);border-radius:12px;
+  background:#fff;-webkit-overflow-scrolling:touch;scrollbar-width:thin;
+}
+.tl-inner{width:max-content;min-width:100%}
+.tl-row{display:flex;align-items:stretch;border-bottom:1px dashed var(--line)}
+.tl-row:last-child{border-bottom:0}
+.tl-name{
+  position:sticky;left:0;z-index:2;flex:none;width:150px;background:#fff;
+  border-right:1px solid var(--line);padding:9px 12px;display:flex;flex-direction:column;justify-content:center;gap:2px;
+}
+.tl-name .nm{font-family:var(--serif);font-size:15px;line-height:1.35;word-break:break-word}
+.tl-name .sub{font-size:11px;color:var(--ink-2)}
+.tl-name-head{font-size:12px;color:var(--ink-2)}
+.tl-track{display:flex;gap:4px;padding:6px 8px;align-items:center}
+.tl-date,.tl-cell{flex:none;width:30px}
+.tl-date{text-align:center;font-size:10px;line-height:1.25;color:var(--ink-2);display:flex;flex-direction:column;gap:1px}
+.tl-date .tl-mon{height:14px;font-size:10px;color:var(--blue-700);font-weight:600}
+.tl-date .tl-w{height:14px}
+.tl-date.is-today .tl-w{color:var(--blue-700);font-weight:700}
+.tl-date.is-future{opacity:.55}
+.tl-cell{
+  height:30px;display:grid;place-items:center;border:1px solid var(--line);border-radius:6px;
+  background:var(--blue-50);color:var(--ink-2);font-size:11px;line-height:1;padding:0;
+  transition:transform .2s,background .2s,border-color .2s;
+}
+.tl-cell.done{background:var(--blue-700);border-color:var(--blue-700);color:#fff;font-size:13px}
+.tl-cell.today{border:2px dashed var(--blue-500)}
+.tl-cell.future{background:#fff;opacity:.55}
+.tl-cell.month-start{box-shadow:-3px 0 0 -1px var(--blue-300)}
+.tl-cell:not(:disabled):hover{transform:scale(1.08)}
+.tl-cell:focus-visible{outline:3px solid var(--blue-500);outline-offset:2px}
+.tl-legend{margin-top:10px;font-size:12px;color:var(--ink-2);display:flex;gap:14px;flex-wrap:wrap}
+.tl-legend .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:4px;border:1px solid var(--line)}
+
+/* 后台 */
+.admin-lead{max-width:980px;margin:0 0 18px;color:var(--ink-2);font-size:13px}
+.admin-card{scroll-margin-top:20px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field.wide{grid-column:1/-1}
+.field>span{color:var(--ink-2);font-size:12px}
+input[type=text],input[type=number],input[type=date],select,textarea{
+  width:100%;min-width:0;padding:9px 11px;border:1px solid var(--line);border-radius:10px;
+  background:#fff;font-size:14px;transition:border-color .2s,box-shadow .2s;
+}
+input:hover,select:hover,textarea:hover{border-color:var(--blue-200)}
+input:focus,select:focus,textarea:focus{border-color:var(--blue-500);outline:none;box-shadow:0 0 0 3px rgba(91,117,145,.15)}
+textarea{resize:vertical;line-height:1.6}
+.board-list,.edit-list{display:flex;flex-direction:column;gap:10px}
+.board-row,.edit-row{display:grid;gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--blue-50)}
+.board-row{grid-template-columns:26px minmax(0,1fr) 150px auto}
+.board-no{color:var(--blue-700);font-family:var(--serif);text-align:center}
+.row-btns{display:flex;gap:5px}
+.row-btns button,.edit-row>button{
+  min-width:32px;height:32px;padding:0 8px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--blue-700);
+}
+.row-btns button:hover,.edit-row>button:hover{background:var(--blue-100)}
+.row-btns .danger,.edit-row>button.danger{color:var(--danger)}
+.btn-mini{font-size:12px;min-width:56px!important}
+.goal-row{grid-template-columns:minmax(90px,1fr) 82px minmax(120px,2fr) 36px}
+.note-row{grid-template-columns:150px minmax(0,1fr) 36px}
+.sched-edit{grid-template-columns:minmax(100px,2fr) 110px 150px 36px}
+.habit-edit{grid-template-columns:minmax(100px,1.4fr) minmax(100px,1fr) 66px 36px}
+.add-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.add-row input{flex:1;min-width:160px}
+.add-row select{width:150px}
+.editor{margin-top:18px;padding:18px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.editor:first-of-type{margin-top:0}
+.editor-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.editor-head h3{font-size:17px}
+.editor .btn{margin-top:12px}
+.data-btns{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 10px}
+
+/* 保存状态 / 数据安全 */
+.save-status{
+  border:1px solid var(--blue-100);background:var(--blue-50);color:var(--blue-700);
+  border-radius:999px;padding:5px 12px;font-size:12px;white-space:nowrap;cursor:pointer;
+  transition:background .2s,border-color .2s;max-width:210px;overflow:hidden;text-overflow:ellipsis;
+}
+.save-status:hover{background:#fff}
+.save-status.fresh{background:#fff8ec;border-color:#e8cfa5;color:#8a6428}
+.save-status.bad{background:#fdecec;border-color:#e6a9a9;color:var(--danger)}
+.save-status .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#5a8a6a;margin-right:6px;vertical-align:1px}
+.save-status.fresh .dot{background:#c99a45}
+.save-status.bad .dot{background:var(--danger)}
+.data-status{
+  margin:14px 0 4px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--blue-50);
+  font-size:13px;color:var(--ink-2);line-height:1.9;
+}
+.data-status b{color:var(--ink)}
+.data-status .ds-row{display:flex;gap:8px 18px;flex-wrap:wrap}
+.data-status .ok{color:#3c7a52;font-weight:600}
+.data-status .warn{color:var(--danger);font-weight:600}
+.data-status .faint{color:var(--ink-2)}
+.notice{
+  margin:12px 0 0;padding:11px 14px;border-left:3px solid var(--blue-500);
+  background:var(--blue-50);border-radius:0 10px 10px 0;font-size:12.5px;color:var(--ink-2);line-height:1.85;
+}
+.notice b{color:var(--ink)}
+
+/* 按钮 */
+.btn{border:1px solid transparent;border-radius:10px;padding:9px 16px;font-size:14px;transition:transform .2s,box-shadow .2s,background .2s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--blue-700);color:#fff}
+.btn-primary:hover{box-shadow:0 4px 12px rgba(62,76,100,.25)}
+.btn-soft{background:var(--blue-50);border-color:var(--blue-100);color:var(--blue-700)}
+.btn-ghost{background:#fff;border-color:var(--line);color:var(--blue-700);width:100%}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger-ghost{background:#fff;border-color:var(--danger);color:var(--danger)}
+.btn-sm{padding:6px 12px;font-size:13px}
+
+/* 提示 / 弹窗 */
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translate(-50%,16px);z-index:60;
+  background:var(--blue-900);color:#fff;padding:10px 20px;border-radius:999px;font-size:13px;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:90vw;text-align:center;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.err{background:var(--danger)}
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px}
+.modal-back{position:absolute;inset:0;background:rgba(44,58,78,.42)}
+.modal-card{position:relative;width:min(440px,100%);background:#fff;border-radius:var(--r);padding:26px;box-shadow:0 16px 48px rgba(44,58,78,.22)}
+.modal-card h2{font-size:20px;margin-bottom:10px}
+.modal-card p{font-size:14px;color:var(--ink-2);line-height:1.8}
+.check-row{display:flex;align-items:center;gap:9px;margin:16px 0 4px;font-size:14px;cursor:pointer}
+.check-row input{width:18px;height:18px;accent-color:var(--blue-700)}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
+
+@media (max-width:992px){
+  .app{grid-template-columns:200px minmax(0,1fr)}
+  .main{padding:0 22px 56px}
+  .sidebar{padding:22px 12px}
+  .card{padding:20px}
+}
+@media (max-width:768px){
+  .app{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:30;height:auto;width:100%;flex-direction:row;align-items:center;gap:8px;
+    padding:9px 12px;overflow-x:auto;overflow-y:hidden;border-right:0;border-bottom:1px solid var(--line);
+    background:rgba(255,255,255,.95);scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{display:none}
+  .nav{flex-direction:row;flex-wrap:nowrap;gap:7px;overflow:visible;padding:0;flex:none}
+  .nav-btn{width:auto;white-space:nowrap;padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;min-height:40px}
+  .nav-btn.active{border-color:var(--blue-700)}
+  .sidebar-foot{margin:0;padding:0;flex:none;position:sticky;right:0}
+  #modeBtn{width:auto;white-space:nowrap;padding:8px 14px;border-radius:999px;min-height:40px}
+  #modeBtnTop{display:inline-block}
+  .main{padding:0 14px 48px}
+  .topbar{padding:20px 0 18px;align-items:flex-end}
+  .page-title{font-size:21px;padding:4px 14px 6px}
+  .badge{display:none}
+  .save-status{font-size:11px;padding:4px 9px;max-width:126px}
+  .card{padding:16px 14px;margin-bottom:14px;border-radius:14px}
+  .grid-2{gap:14px}
+  .stat-num{font-size:38px}
+  .board-row,.goal-row,.note-row,.sched-edit,.habit-edit{grid-template-columns:1fr}
+  .board-row{grid-template-columns:24px 1fr}
+  .board-row .row-btns{grid-column:1/-1;justify-content:flex-end}
+  .goal-row>button,.note-row>button,.sched-edit>button,.habit-edit>button{justify-self:end}
+  .tl-name{width:104px;padding:8px}
+  .tl-name .nm{font-size:13px}
+  .tl-date,.tl-cell{width:27px}
+  .tl-cell{height:28px;font-size:10px}
+  .tl-track{gap:3px;padding:6px}
+}
+/* 勾选：三件事与日程条目 */
+.task-text.placeholder{color:var(--ink-2)}
+.task-text.done{text-decoration:line-through;color:var(--ink-2)}
+.sched-check{width:18px;height:18px;accent-color:var(--blue-700);cursor:pointer;margin:0}
+.sched-row.is-done .sched-thing,.sched-row.is-done .sched-date{text-decoration:line-through;opacity:.55}
+.cd-tag{font-style:normal;font-size:11px;color:var(--blue-700);background:var(--blue-50);border:1px solid var(--blue-100);border-radius:999px;padding:1px 8px;margin-left:8px;white-space:nowrap;vertical-align:middle}
+.cd-tag.is-today{background:var(--blue-700);border-color:var(--blue-700);color:#fff}
+/* 任务倒计时 */
+.cd-task{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.cd-big{font-family:var(--serif);font-size:52px;line-height:1;color:var(--blue-900);white-space:nowrap}
+.cd-big .unit{font-family:var(--sans);font-size:15px;margin-left:6px;color:var(--ink-2)}
+.cd-info{flex:1;min-width:200px}
+.cd-next{margin-top:14px;border-top:1px dashed var(--line);padding-top:10px}
+.cd-next li{display:flex;gap:10px;align-items:center;padding:4px 0;font-size:13px;color:var(--ink-2)}
+/* 账本 */
+.money-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:6px 0 14px}
+.money-cell{background:var(--blue-50);border:1px solid var(--line);border-radius:12px;padding:12px}
+.money-cell .k{font-size:12px;color:var(--ink-2)}
+.money-cell .v{font-family:var(--serif);font-size:24px;line-height:1.3}
+.money-in{color:var(--ok)}
+.money-out{color:var(--danger)}
+.list-plain li.ledger-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px dashed var(--line);flex-wrap:wrap}
+.list-plain .ledger-row .l-thing{flex:1;min-width:140px;word-break:break-word}
+.list-plain .ledger-row .l-amt{font-variant-numeric:tabular-nums;white-space:nowrap}
+.list-plain .ledger-row .l-date{font-size:12px;color:var(--ink-2);white-space:nowrap;margin-left:auto}
+.ledger-edit{grid-template-columns:130px minmax(0,1fr) 90px 100px 36px}
+@media (max-width:768px){
+  .money-grid{gap:8px}.money-cell{padding:9px}.money-cell .v{font-size:19px}
+  .cd-big{font-size:42px}.ledger-edit{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:20px minmax(0,1fr) auto}
+  .sched-date{grid-column:2/-1;text-align:right}
+}
+@media (max-width:400px){
+  .list-plain li.ledger-row{gap:6px 10px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" aria-label="主导航">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">台</span>
+      <div><strong id="brandTitle">我的大学工作台</strong><small id="brandSub">安静一点，慢慢来</small></div>
+    </div>
+    <nav id="nav" class="nav" aria-label="页面导航"></nav>
+    <div class="sidebar-foot"><button id="modeBtn" class="btn btn-ghost" type="button">后台填写</button></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow" id="todayLabel"></p>
+        <h1 class="page-title" id="pageTitle">总览</h1>
+      </div>
+      <div class="topbar-right">
+        <button id="saveStatus" class="save-status" type="button" data-action="go-admin" data-target="sec-data" title="查看数据保存状态"><span class="dot"></span><span id="saveStatusText">正在检查存档…</span></button>
+        <span class="badge" id="modeBadge">前台 · 给我看</span>
+        <button id="modeBtnTop" class="btn btn-soft btn-sm" type="button">后台填写</button>
+      </div>
+    </header>
+
+    <section id="frontView" class="view" aria-label="前台内容"></section>
+    <section id="adminView" class="view" aria-label="后台填写" hidden></section>
+  </main>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<div id="modal" class="modal" hidden>
+  <div class="modal-back" data-action="modal-cancel"></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h2 id="modalTitle" class="serif"></h2>
+    <p id="modalBody"></p>
+    <label class="check-row" id="modalCheckRow" hidden>
+      <input type="checkbox" id="modalCheck"><span id="modalCheckLabel"></span>
+    </label>
+    <div class="modal-actions">
+      <button class="btn btn-soft" type="button" data-action="modal-cancel">取消</button>
+      <button class="btn btn-danger" id="modalOk" type="button" data-action="modal-confirm">确认</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="restoreFile" accept=".json,application/json" hidden>
+
+<script>
+(function(){
+'use strict';
+
+/* ============ 基础工具 ============ */
+var KEY='my_uni_workbench_v1';        /* 主存档：格式与旧版完全一致，已有数据直接可用 */
+var META='my_uni_workbench_v1_meta'; /* 存档时间 / 序号，用来判断哪一份最新 */
+var IDB_NAME='my_uni_workbench_safe';
+var IDB_STORE='kv';
+var K_SNAP='snapshot';
+var K_HANDLE='fileHandle';
+var VERSION=2;
+var TYPES={goal:'目标冲刺',schedule:'日程清单',habit:'打卡',ledger:'账本（账单）'};
+
+/* 三层存储的运行状态 */
+var storageInfo={
+  source:'demo',       /* demo | local | indexeddb | file */
+  savedAt:0,
+  hasSaved:false,
+  storageOK:true,      /* localStorage 是否真的写得进去 */
+  idbOK:null,          /* 备用存档是否可用 */
+  fileName:'',
+  fileOK:false,
+  fileNeedGrant:false,
+  fileError:''
+};
+var fileHandle=null;
+var saveSeq=0;
+var dirtySinceBoot=false;  /* 用户已经动过手，就不让异步恢复覆盖 */
+var fileTimer=null;
+var WEEK=['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+function uid(){return 'x'+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4);}
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+});}
+function todayStr(d){
+  d=d||new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function addDays(s,n){var d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return todayStr(d);}
+function daysBetween(a,b){return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);}
+function fmtCN(s){
+  if(!s)return '日期待定';
+  var p=s.split('-');
+  if(p.length!==3)return esc(s);
+  return Number(p[0])+' 年 '+Number(p[1])+' 月 '+Number(p[2])+' 日';
+}
+function getByPath(o,p){return p.split('.').reduce(function(a,k){return a==null?undefined:a[k];},o);}
+function setByPath(o,p,v){
+  var ks=p.split('.'),cur=o;
+  for(var i=0;i<ks.length-1;i++){
+    if(cur[ks[i]]==null)cur[ks[i]]=/^\d+$/.test(ks[i+1])?[]:{};
+    cur=cur[ks[i]];
+  }
+  cur[ks[ks.length-1]]=v;
+}
+function arr(v){return Array.isArray(v)?v:[];}
+function obj(v){return v&&typeof v==='object'&&!Array.isArray(v)?v:{};}
+
+/* ============ 默认数据（首次打开的示范内容，来自需求说明书） ============ */
+function defaultState(){
+  return {
+    schemaVersion:VERSION,
+    profile:{
+      name:'芷印',
+      siteTitle:'我的大学工作台',
+      school:'江西工程学院，贸易经济专业，2026 级大一'
+    },
+    settings:{startPage:'overview'},
+    overview:{topThree:[
+      {id:'t1',text:'',doneOn:''},{id:'t2',text:'',doneOn:''},{id:'t3',text:'',doneOn:''}
+    ]},
+    boards:[
+      {
+        id:'b-goal',name:'目标进度本',type:'goal',
+        data:{
+          title:'成绩排前 5 名（重点是数学和英语）',
+          date:'',
+          progress:[
+            {id:'p1',name:'技能学习',percent:0,note:'PPT，剪辑，AI 视频/漫剧（交叉学习）'},
+            {id:'p2',name:'北辰实习',percent:0,note:'2026 年 11 月 1 日至 2026 年 11 月 30 日，组长之一'},
+            {id:'p3',name:'商创会',percent:0,note:'网赚项目'},
+            {id:'p4',name:'校园组织',percent:0,note:'校学生会学术部、大学生就业指导协会组织部；每周总共最多参加 2 次活动'},
+            {id:'p5',name:'市调大赛',percent:0,note:'第十七届市调大赛，知识赛 2026 年 11 月 20 日截止，组队时间待定'},
+            {id:'p6',name:'英语',percent:0,note:'每日背 50 个单词；其他支任务待定'}
+          ],
+          notes:[]
+        }
+      },
+      {
+        id:'b-schedule',name:'日程簿',type:'schedule',
+        data:{
+          types:['实习','比赛','收入','技能','学业','校园','健康'],
+          items:[
+            {id:'s1',date:'',thing:'技能学习',type:'技能',done:false},
+            {id:'s2',date:'2026-11-01',thing:'北辰实习（2026 年 11 月 1日至11月30日）',type:'实习',done:false},
+            {id:'s3',date:'',thing:'商创会',type:'收入',done:false},
+            {id:'s4',date:'',thing:'校园组织',type:'校园',done:false},
+            {id:'s5',date:'2026-11-20',thing:'市调大赛（知识赛截止；组队时间待定）',type:'比赛',done:false},
+            {id:'s6',date:'',thing:'英语',type:'学业',done:false}
+          ]
+        }
+      },
+      {
+        id:'b-habit',name:'天天打卡',type:'habit',
+        data:{
+          pastDays:90,
+          futureDays:30,
+          habits:[
+            {id:'h1',name:'每日背 50 个单词',note:'',records:{}},
+            {id:'h2',name:'23:00 前睡觉（健康）',note:'健康',records:{}}
+          ]
+        }
+      },
+      {
+        id:'b-ledger',name:'我的账本',type:'ledger',
+        data:{
+          monthBudget:1000,
+          foodBudget:500,
+          incomeMin:500,
+          incomeMax:1000,
+          note:'说明书里：每月生活费大约 1000 元，伙食费约 500 元；想每月有 500 到 1000 元收入。',
+          entries:[]
+        }
+      }
+    ]
+  };
+}
+function blankState(){
+  var d=defaultState();
+  d.profile.name='';d.profile.school='';
+  d.boards=[];
+  d.overview.topThree=[{id:'t1',text:'',doneOn:''},{id:'t2',text:'',doneOn:''},{id:'t3',text:'',doneOn:''}];
+  return d;
+}
+function emptyData(t){
+  if(t==='goal')return {title:'',date:'',progress:[],notes:[]};
+  if(t==='schedule')return {types:['待定'],items:[]};
+  if(t==='habit')return {pastDays:90,futureDays:30,habits:[]};
+  if(t==='ledger')return {monthBudget:0,foodBudget:0,incomeMin:0,incomeMax:0,note:'',entries:[]};
+  return {};
+}
+function makeBoard(t,name){return {id:uid(),name:name||TYPES[t],type:t,data:emptyData(t)};}
+
+/* ============ 读取 / 迁移 / 保存：以后加字段也不丢已存数据 ============ */
+function mergeDefaults(def,saved){
+  if(Array.isArray(def)){
+    if(!Array.isArray(saved))return clone(def);
+    return saved.map(function(item){
+      if(item&&typeof item==='object'&&item.id){
+        var tpl=def.filter(function(d){return d&&d.id===item.id;})[0];
+        if(tpl)return mergeDefaults(tpl,item);
+      }
+      return item;
+    });
+  }
+  if(def&&typeof def==='object'){
+    var out={};
+    if(saved&&typeof saved==='object'&&!Array.isArray(saved)){
+      Object.keys(saved).forEach(function(k){out[k]=saved[k];});
+    }
+    Object.keys(def).forEach(function(k){
+      if(!(k in out))out[k]=clone(def[k]);
+      else out[k]=mergeDefaults(def[k],out[k]);
+    });
+    return out;
+  }
+  return saved===undefined?clone(def):saved;
+}
+function migrate(raw){
+  if(!raw||typeof raw!=='object'||Array.isArray(raw))return defaultState();
+  if(typeof raw.schemaVersion!=='number')raw.schemaVersion=1;
+  /* v1 → v2：补上「账本」积木，旧数据一条不动；已主动删掉账本的 v2 数据不会被填回 */
+  if(raw.schemaVersion<2){
+    var bs=arr(raw.boards);
+    if(!bs.some(function(b){return b&&b.type==='ledger';})){
+      var defLedger=defaultState().boards.filter(function(b){return b.id==='b-ledger';})[0];
+      if(defLedger)bs.push(clone(defLedger));
+    }
+    raw.boards=bs;
+    raw.schemaVersion=2;
+  }
+  return mergeDefaults(defaultState(),raw);
+}
+/* ---- 备用存档：IndexedDB，和 localStorage 相互独立，清掉一处还有另一处 ---- */
+function idbOpen(cb){
+  try{
+    if(!window.indexedDB){cb(null);return;}
+    var req=indexedDB.open(IDB_NAME,1);
+    req.onupgradeneeded=function(){
+      var d=req.result;
+      if(!d.objectStoreNames.contains(IDB_STORE))d.createObjectStore(IDB_STORE);
+    };
+    req.onsuccess=function(){cb(req.result);};
+    req.onerror=function(){cb(null);};
+    req.onblocked=function(){cb(null);};
+  }catch(e){cb(null);}
+}
+function idbPut(k,v,cb){
+  idbOpen(function(db){
+    if(!db){storageInfo.idbOK=false;if(cb)cb(false);return;}
+    try{
+      var tx=db.transaction(IDB_STORE,'readwrite');
+      tx.objectStore(IDB_STORE).put(v,k);
+      tx.oncomplete=function(){storageInfo.idbOK=true;try{db.close();}catch(e){}if(cb)cb(true);};
+      tx.onerror=tx.onabort=function(){storageInfo.idbOK=false;try{db.close();}catch(e){}if(cb)cb(false);};
+    }catch(e){storageInfo.idbOK=false;try{db.close();}catch(x){}if(cb)cb(false);}
+  });
+}
+function idbGet(k,cb){
+  idbOpen(function(db){
+    if(!db){cb(null);return;}
+    var req;
+    try{req=db.transaction(IDB_STORE,'readonly').objectStore(IDB_STORE).get(k);}
+    catch(e){try{db.close();}catch(x){}cb(null);return;}
+    req.onsuccess=function(){var v=req.result;try{db.close();}catch(e){}cb(v===undefined?null:v);};
+    req.onerror=function(){try{db.close();}catch(e){}cb(null);};
+  });
+}
+function idbDel(k,cb){
+  idbOpen(function(db){
+    if(!db){if(cb)cb();return;}
+    try{
+      var tx=db.transaction(IDB_STORE,'readwrite');
+      tx.objectStore(IDB_STORE).delete(k);
+      tx.oncomplete=tx.onerror=function(){try{db.close();}catch(e){}if(cb)cb();};
+    }catch(e){try{db.close();}catch(x){}if(cb)cb();}
+  });
+}
+
+function readMeta(){try{return JSON.parse(localStorage.getItem(META)||'{}')||{};}catch(e){return {};}}
+function writeMeta(m){try{localStorage.setItem(META,JSON.stringify(m));}catch(e){}}
+function parseState(raw){
+  if(!raw)return null;
+  try{
+    var v=typeof raw==='string'?JSON.parse(raw):raw;
+    if(v&&v.state&&typeof v.state==='object')v=v.state;  /* 也认备份文件的格式 */
+    if(v&&typeof v==='object'&&!Array.isArray(v)&&Array.isArray(v.boards))return v;
+  }catch(e){}
+  return null;
+}
+function stamp(t){
+  if(!t)return '未知';
+  var d=new Date(t);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+
+    ' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+
+function load(){
+  var meta=readMeta(),raw=null;
+  try{raw=localStorage.getItem(KEY);}catch(e){storageInfo.storageOK=false;}
+  var s=parseState(raw);
+  saveSeq=Number(meta.seq)||0;
+  if(s){
+    storageInfo.source='local';
+    storageInfo.savedAt=Number(meta.savedAt)||0;
+    storageInfo.hasSaved=true;
+    return migrate(s);
+  }
+  storageInfo.source='demo';   /* 没有存档：明确标成示范内容，不静默当成用户数据 */
+  storageInfo.hasSaved=false;
+  return defaultState();
+}
+
+/* ---- 文件同步：绑定一个 .json，换路径 / 换浏览器 / 清缓存都不丢 ---- */
+function filePayload(){
+  return JSON.stringify({app:'我的大学工作台',schemaVersion:VERSION,
+    exportedAt:new Date().toISOString(),savedAt:storageInfo.savedAt||Date.now(),state:state},null,2);
+}
+function writeFileNow(){
+  if(!fileHandle)return Promise.resolve(false);
+  return Promise.resolve()
+    .then(function(){return fileHandle.createWritable();})
+    .then(function(w){return w.write(filePayload()).then(function(){return w.close();});})
+    .then(function(){storageInfo.fileOK=true;storageInfo.fileError='';renderSaveStatus();return true;})
+    .catch(function(e){
+      storageInfo.fileOK=false;
+      storageInfo.fileError=(e&&e.name==='NotAllowedError')?'需要重新授权':(e&&e.message||'写入失败');
+      renderSaveStatus();return false;
+    });
+}
+function scheduleFileWrite(){
+  if(!fileHandle)return;
+  clearTimeout(fileTimer);
+  fileTimer=setTimeout(function(){writeFileNow();},600);
+}
+function flushFile(){
+  if(!fileHandle)return;
+  clearTimeout(fileTimer);
+  writeFileNow();
+}
+function persistFileHandle(h){
+  if(h)idbPut(K_HANDLE,h,function(){});
+  else idbDel(K_HANDLE,function(){});
+}
+function bindDataFile(){
+  if(typeof window.showSaveFilePicker!=='function'){
+    toast('这个浏览器不支持自动文件同步，请用电脑版 Chrome / Edge，或定期点「备份」','error');return;
+  }
+  window.showSaveFilePicker({
+    suggestedName:'我的工作台-数据.json',
+    types:[{description:'工作台数据文件（JSON）',accept:{'application/json':['.json']}}]
+  }).then(function(h){
+    fileHandle=h;
+    storageInfo.fileName=h.name||'我的工作台-数据.json';
+    storageInfo.fileNeedGrant=false;
+    persistFileHandle(h);
+    return writeFileNow();
+  }).then(function(ok){
+    if(mode==='admin')rerenderAdminKeepScroll();
+    renderSaveStatus();
+    toast(ok?'已绑定数据文件，之后每次改动都会自动写进去':'文件已绑定，但这次写入没成功');
+  }).catch(function(e){
+    if(e&&e.name==='AbortError')return;
+    toast('绑定没成功：'+(e&&e.message||e),'error');
+  });
+}
+function unbindDataFile(){
+  openConfirm({
+    title:'解除数据文件',
+    body:'解除后不再自动往那个 .json 文件写内容，文件本身不会被删除。工作台仍会自动存在浏览器里。',
+    confirmText:'解除绑定',danger:false,
+    onConfirm:function(){
+      fileHandle=null;clearTimeout(fileTimer);
+      storageInfo.fileName='';storageInfo.fileOK=false;storageInfo.fileNeedGrant=false;
+      persistFileHandle(null);
+      rerenderAdminKeepScroll();renderSaveStatus();
+      toast('已解除数据文件');
+    }
+  });
+}
+function reconnectDataFile(){
+  if(!fileHandle){bindDataFile();return;}
+  try{
+    Promise.resolve(fileHandle.requestPermission?fileHandle.requestPermission({mode:'readwrite'}):'granted')
+      .then(function(p){
+        if(p!=='granted'){toast('还是没有文件权限，可以重新点「绑定数据文件」','error');return;}
+        storageInfo.fileNeedGrant=false;renderSaveStatus();
+        return syncFromBoundFile(true);
+      }).catch(function(e){toast('授权失败：'+(e&&e.message||e),'error');});
+  }catch(e){toast('授权失败：'+e.message,'error');}
+}
+
+/* 把当前 state 同步写到全部存储位置，但不改变存档时间戳（用于启动恢复） */
+function writeAllNow(){
+  var json;
+  try{json=JSON.stringify(state);}catch(e){return;}
+  try{localStorage.setItem(KEY,json);}catch(e){}
+  var meta=readMeta();meta.savedAt=storageInfo.savedAt;meta.seq=saveSeq;meta.version=VERSION;writeMeta(meta);
+  idbPut(K_SNAP,{savedAt:storageInfo.savedAt,seq:saveSeq,json:json});
+  if(fileHandle)writeFileNow();
+}
+
+/* ---- 主保存：本地存档 + 备用存档 + 数据文件，写后读回校验 ---- */
+function save(){
+  var json;
+  try{json=JSON.stringify(state);}catch(e){toast('数据异常，没能保存','error');return;}
+  dirtySinceBoot=true;
+  var lsOK=false;
+  try{
+    localStorage.setItem(KEY,json);
+    lsOK=(localStorage.getItem(KEY)===json);
+  }catch(e){lsOK=false;}
+  storageInfo.storageOK=lsOK;
+  storageInfo.hasSaved=true;
+  storageInfo.savedAt=Date.now();
+  storageInfo.source=lsOK?'local':'indexeddb';
+  saveSeq++;
+  var meta=readMeta();
+  meta.savedAt=storageInfo.savedAt;meta.seq=saveSeq;meta.version=VERSION;
+  writeMeta(meta);
+  idbPut(K_SNAP,{savedAt:storageInfo.savedAt,seq:saveSeq,json:json});
+  scheduleFileWrite();
+  renderSaveStatus();
+  if(!lsOK)toast('本地存储没写成功，已存进备用存档；建议绑定数据文件','error');
+}
+
+/* ---- 状态显示：顶栏常驻 + 后台数据管理详细清单 ---- */
+function statusHTML(){
+  var src={demo:'首次打开 · 示范内容',local:'浏览器本地存档',indexeddb:'备用存档',file:'绑定的数据文件'}[storageInfo.source]||'浏览器本地存档';
+  var rows=[];
+  rows.push('<div class="ds-row"><span>当前载入</span><b>'+esc(src)+'</b></div>');
+  rows.push('<div class="ds-row"><span>上次保存</span><b>'+(storageInfo.hasSaved?esc(stamp(storageInfo.savedAt)):'还没有保存过')+'</b></div>');
+  rows.push('<div class="ds-row"><span>浏览器本地存档</span><span class="'+(storageInfo.storageOK?'ok':'warn')+'">'+
+    (storageInfo.storageOK?'正常，改动会立刻写入':'写入失败，靠备用存档兜底')+'</span></div>');
+  rows.push('<div class="ds-row"><span>备用存档</span><span class="'+(storageInfo.idbOK===false?'warn':'ok')+'">'+
+    (storageInfo.idbOK===false?'这个浏览器不可用':'开启，与本地存档互相备份')+'</span></div>');
+  if(fileHandle||storageInfo.fileName){
+    rows.push('<div class="ds-row"><span>数据文件</span><span class="'+(storageInfo.fileNeedGrant||!storageInfo.fileOK?'warn':'ok')+'">'+
+      esc(storageInfo.fileName||'已绑定')+' · '+
+      (storageInfo.fileNeedGrant?'需要点一下「重新连接」':storageInfo.fileOK?'自动同步中':'未写入'+(storageInfo.fileError?'（'+esc(storageInfo.fileError)+'）':''))+'</span></div>');
+  }else{
+    rows.push('<div class="ds-row"><span>数据文件</span><span class="faint">未绑定（绑定后换浏览器、清缓存都不丢）</span></div>');
+  }
+  return rows.join('');
+}
+function renderSaveStatus(){
+  var el=document.getElementById('saveStatus'),tx=document.getElementById('saveStatusText');
+  if(el&&tx){
+    var bad=!storageInfo.storageOK||(fileHandle&&!storageInfo.fileOK&&!storageInfo.fileNeedGrant);
+    el.className='save-status'+(bad?' bad':storageInfo.hasSaved?'':' fresh');
+    el.title='点击查看数据保存状态';
+    tx.textContent=bad?'保存异常 · 点这里查看':
+      (storageInfo.hasSaved?'已自动保存 '+stamp(storageInfo.savedAt).slice(11):'首次打开 · 示范内容');
+  }
+  var d=document.getElementById('dataStatus');
+  if(d)d.innerHTML=statusHTML();
+}
+
+/* ---- 启动时的异步找回：哪份存档更新就用哪份 ---- */
+function syncFromBoundFile(force){
+  if(!fileHandle||!fileHandle.getFile)return Promise.resolve(false);
+  return fileHandle.getFile().then(function(f){return f.text();}).then(function(txt){
+    var p;try{p=JSON.parse(txt);}catch(e){throw new Error('文件不是有效的 JSON');}
+    var s=parseState(p);
+    if(!s)throw new Error('文件内容不是工作台数据');
+    var t=Number(p&&p.savedAt)||0;
+    if(dirtySinceBoot){                     /* 本次打开已经改过，以本地为准写回文件 */
+      storageInfo.fileOK=true;storageInfo.fileNeedGrant=false;
+      renderSaveStatus();return writeFileNow();
+    }
+    if(force||t>storageInfo.savedAt){
+      state=migrate(s);
+      storageInfo.savedAt=t||Date.now();
+      storageInfo.hasSaved=true;storageInfo.source='file';
+      writeAllNow();renderAll();
+      if(!force)toast('已从数据文件同步你上次改动的内容');
+    }else{
+      writeFileNow();   /* 本地这份更新，写回文件，两边保持一致 */
+    }
+    storageInfo.fileOK=true;storageInfo.fileNeedGrant=false;storageInfo.fileError='';
+    renderSaveStatus();return true;
+  }).catch(function(e){
+    storageInfo.fileOK=false;storageInfo.fileError=(e&&e.message)||'读取失败';
+    renderSaveStatus();return false;
+  });
+}
+function bootRecovery(){
+  idbGet(K_SNAP,function(rec){
+    if(rec&&!dirtySinceBoot){
+      var s=parseState(rec.json||null),t=Number(rec.savedAt)||0;
+      if(s&&t>storageInfo.savedAt){
+        state=migrate(s);
+        storageInfo.savedAt=t;storageInfo.hasSaved=true;storageInfo.source='indexeddb';
+        writeAllNow();renderAll();
+        toast('已从备用存档恢复你上次改动的内容');
+      }
+    }
+    idbGet(K_HANDLE,function(h){
+      if(h&&h.getFile){
+        fileHandle=h;storageInfo.fileName=h.name||'数据文件';
+        var q;
+        try{q=h.queryPermission?h.queryPermission({mode:'readwrite'}):Promise.resolve('granted');}
+        catch(e){q=Promise.resolve('denied');}
+        Promise.resolve(q).then(function(p){
+          if(p!=='granted'){storageInfo.fileNeedGrant=true;storageInfo.fileOK=false;renderSaveStatus();return;}
+          return syncFromBoundFile(false);
+        }).catch(function(){storageInfo.fileNeedGrant=true;renderSaveStatus();});
+      }
+      renderSaveStatus();
+    });
+  });
+}
+
+/* ============ 全局状态 ============ */
+var state=load();
+var mode='front';
+var currentView=(state.settings&&state.settings.startPage)||'overview';
+if(currentView!=='overview'&&!state.boards.some(function(b){return 'board:'+b.id===currentView;}))currentView='overview';
+var modalConfirm=null;
+var toastTimer=null;
+var activeSection='';
+var tlPos={}; /* 记住每个打卡时间轴滑到哪儿，重绘后不跳回 */
+
+function toast(msg,kind){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show'+(kind==='error'?' err':'');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){t.className='toast';},2800);
+}
+
+/* ============ 弹窗 ============ */
+function openConfirm(cfg){
+  document.getElementById('modalTitle').textContent=cfg.title;
+  document.getElementById('modalBody').innerHTML=cfg.body;
+  var row=document.getElementById('modalCheckRow'),chk=document.getElementById('modalCheck');
+  row.hidden=!cfg.checkLabel;
+  if(cfg.checkLabel){document.getElementById('modalCheckLabel').textContent=cfg.checkLabel;chk.checked=false;}
+  var ok=document.getElementById('modalOk');
+  ok.textContent=cfg.confirmText||'确认';
+  ok.className='btn '+(cfg.danger===false?'btn-primary':'btn-danger');
+  document.getElementById('modal').hidden=false;
+  modalConfirm=cfg.onConfirm||null;
+  ok.focus();
+}
+function closeModal(){document.getElementById('modal').hidden=true;modalConfirm=null;}
+
+/* ============ 导航 / 模式 ============ */
+function navBtn(id,label,active){
+  return '<button type="button" class="nav-btn'+(active?' active':'')+'" data-nav="'+esc(id)+'"'+
+    (active?' aria-current="page"':'')+'>'+label+'</button>';
+}
+function renderNav(){
+  var html='';
+  if(mode==='front'){
+    html+=navBtn('overview','总览',currentView==='overview');
+    state.boards.forEach(function(b){
+      html+=navBtn('board:'+b.id,esc(b.name||'未命名板块'),currentView==='board:'+b.id);
+    });
+  }else{
+    html+=navBtn('back','← 回前台',false);
+    [['sec-basic','基本设置'],['sec-boards','板块管理'],['sec-content','板块内容'],
+     ['sec-overview','总览设置'],['sec-data','数据管理']].forEach(function(x){
+      html+=navBtn(x[0],x[1],activeSection===x[0]);
+    });
+  }
+  document.getElementById('nav').innerHTML=html;
+}
+function pageName(v){
+  if(v==='overview')return '总览';
+  var b=state.boards.filter(function(x){return 'board:'+x.id===v;})[0];
+  return b?(b.name||'未命名板块'):'总览';
+}
+function setMode(m,target){
+  mode=m;
+  if(m==='front')activeSection='';
+  else if(target)activeSection=target.indexOf('editor-')===0?'sec-content':(target.indexOf('sec-')===0?target:'');
+  else activeSection='sec-basic';
+  document.getElementById('frontView').hidden=m!=='front';
+  document.getElementById('adminView').hidden=m!=='admin';
+  document.getElementById('modeBtn').textContent=m==='front'?'后台填写':'← 回前台';
+  document.getElementById('modeBtnTop').textContent=m==='front'?'后台填写':'← 回前台';
+  document.getElementById('modeBadge').textContent=m==='front'?'前台 · 给我看':'后台 · 给我填';
+  document.getElementById('pageTitle').textContent=m==='admin'?'后台填写':pageName(currentView);
+  renderAll();
+  if(target){
+    var el=document.getElementById(target);
+    if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+  }else{
+    try{window.scrollTo({top:0,behavior:'smooth'});}catch(e){window.scrollTo(0,0);}
+  }
+}
+function renderAll(){renderNav();renderFront();renderAdmin();}
+
+/* ============ 前台：总览 ============ */
+function firstGoal(){return state.boards.filter(function(b){return b.type==='goal';})[0];}
+function allScheduleItems(){
+  var out=[];
+  state.boards.filter(function(b){return b.type==='schedule';}).forEach(function(b){
+    arr(obj(b.data).items).forEach(function(it){out.push({it:it,board:b.name||'日程清单'});});
+  });
+  return out;
+}
+function streakDays(){
+  var set={};
+  state.boards.filter(function(b){return b.type==='habit';}).forEach(function(b){
+    arr(obj(b.data).habits).forEach(function(h){
+      var r=obj(h.records);
+      Object.keys(r).forEach(function(d){if(r[d])set[d]=1;});
+    });
+  });
+  if(!Object.keys(set).length)return 0;
+  var cur=todayStr();
+  if(!set[cur])cur=addDays(cur,-1);
+  var n=0;
+  while(set[cur]){n++;cur=addDays(cur,-1);}
+  return n;
+}
+function taskHTML(i){
+  var t=arr(state.overview.topThree)[i]||{text:'',doneOn:''};
+  var txt=String(t.text||'').trim();
+  var done=t.doneOn===todayStr();
+  /* 三个勾选框永远在，就算还没填文字也能点、也能存 */
+  return '<label class="task-row">'+
+    '<input type="checkbox" data-action="toggle-task" data-i="'+i+'"'+(done?' checked':'')+
+      ' aria-label="第 '+(i+1)+' 件事">'+
+    '<span class="task-box" aria-hidden="true"></span>'+
+    '<span class="task-text'+(done?' done':'')+(txt?'':' placeholder')+'">'+
+      (txt?esc(txt):'第 '+(i+1)+' 件事（还没填，去后台写）')+'</span></label>';
+}
+function dayTag(date){
+  if(!date)return '<em class="cd-tag">日期待定</em>';
+  var n=daysBetween(todayStr(),date);
+  if(n>0)return '<em class="cd-tag">还有 '+n+' 天</em>';
+  if(n===0)return '<em class="cd-tag is-today">就是今天</em>';
+  return '<em class="cd-tag">已过 '+(-n)+' 天</em>';
+}
+function upcomingTasks(){
+  var t=todayStr();
+  return allScheduleItems().filter(function(x){
+    var it=obj(x.it);return it.date&&it.date>=t&&!it.done;
+  }).sort(function(a,c){return obj(a.it).date.localeCompare(obj(c.it).date);});
+}
+function taskCountdownHTML(){
+  var up=upcomingTasks();
+  if(!up.length){
+    /* 没有未来任务时，不空着：挑最近一件过期又没勾完成的事，提醒去改日期 */
+    var past=allScheduleItems().filter(function(x){
+      var it=obj(x.it);return it.date&&it.date<todayStr()&&!it.done;
+    }).sort(function(a,c){return obj(c.it).date.localeCompare(obj(a.it).date);});
+    if(!past.length)return '<div class="empty-state"><p>还没有排好日期、又没做完的任务。</p>'+
+      '<p class="muted">去后台给日程填上日期，这里就会出现倒计时。</p></div>';
+    var p=obj(past[0].it),over=daysBetween(p.date,todayStr());
+    return '<div class="cd-task"><div class="cd-big">'+String(over)+'<span class="unit">天</span></div>'+
+      '<div class="cd-info"><p class="cd-title">'+esc(p.thing||'未命名')+'</p>'+
+      '<p class="muted small">'+esc(past[0].board)+' · '+esc(p.type||'未分类')+' · '+fmtCN(p.date)+'</p>'+
+      '<p class="muted small">日期已过去 '+over+' 天还没勾完成：去后台换个新日期，或到「日程簿」把它勾掉。</p></div></div>';
+  }
+  var first=obj(up[0].it),n=daysBetween(todayStr(),first.date);
+  var big=n===0?'今天':String(n)+'<span class="unit">天</span>';
+  var html='<div class="cd-task"><div class="cd-big">'+big+'</div>'+
+    '<div class="cd-info"><p class="cd-title">'+esc(first.thing||'未命名')+'</p>'+
+    '<p class="muted small">'+esc(up[0].board)+' · '+esc(first.type||'未分类')+' · '+fmtCN(first.date)+'</p>'+
+    '<p class="muted small">'+(n===0?'就是今天，别忘了':'还有 '+n+' 天')+'</p></div></div>';
+  var rest=up.slice(1,4);
+  if(rest.length)html+='<ul class="cd-next">'+rest.map(function(x){
+    var it=obj(x.it),d=daysBetween(todayStr(),it.date);
+    return '<li><span class="chip">'+esc(it.type||'未分类')+'</span>'+
+      '<span>'+esc(it.thing||'未命名')+'</span>'+
+      '<span style="margin-left:auto;white-space:nowrap">'+(d===0?'今天':'还有 '+d+' 天')+'</span></li>';
+  }).join('')+'</ul>';
+  return html;
+}
+function countdownHTML(){
+  var g=firstGoal();
+  if(!g)return '<p class="empty-hint">还没有「目标冲刺」板块，去后台添加一个，这里就会显示倒计时。</p>';
+  var d=obj(g.data),date=d.date||'';
+  var title='<p class="cd-title">'+esc(d.title||'未命名目标')+'</p>';
+  if(!date)return title+'<div class="stat-num word">日期待定</div><p class="stat-label">去后台填上目标日期，这里会自动倒计时。</p>';
+  var n=daysBetween(todayStr(),date);
+  var big,label;
+  if(n>0){big=String(n);label='天后 · '+fmtCN(date);}
+  else if(n===0){big='0';label='就是今天 · '+fmtCN(date);}
+  else {big=String(-n);label='天前 · '+fmtCN(date);}
+  return title+'<div class="stat-num">'+big+'<span class="unit">天</span></div>'+
+    '<p class="stat-label">'+esc(label)+'</p>';
+}
+function futureHTML(){
+  var start=addDays(todayStr(),1),end=addDays(todayStr(),7);
+  var all=allScheduleItems();
+  var hits=all.filter(function(x){var it=obj(x.it);return it.date&&it.date>=start&&it.date<=end&&!it.done;})
+    .sort(function(a,b){return obj(a.it).date.localeCompare(obj(b.it).date);});
+  var tbd=all.filter(function(x){var it=obj(x.it);return !it.date&&!it.done;}).length;
+  var html='';
+  if(hits.length){
+    html='<ul class="list-plain">'+hits.map(function(x){
+      var it=obj(x.it);
+      return '<li><span class="future-thing">'+esc(it.thing||'未命名')+dayTag(it.date)+'</span>'+
+        '<span class="chip">'+esc(it.type||'未分类')+'</span>'+
+        '<span class="future-date">'+fmtCN(it.date)+'</span></li>';
+    }).join('')+'</ul>';
+  }else{
+    html='<p class="empty-hint">未来 7 天（明天起）没有已排日期的事。</p>';
+  }
+  if(tbd)html+='<p class="muted small" style="margin-top:10px">另有 '+tbd+' 件事日期待定，没算进这里。</p>';
+  return html;
+}
+function overviewHTML(){
+  var h=new Date().getHours();
+  var greet=h<11?'早上好':h<18?'下午好':'晚上好';
+  var name=esc((state.profile&&state.profile.name)||'');
+  var school=esc((state.profile&&state.profile.school)||'');
+  var filled=arr(state.overview.topThree).filter(function(t){return String(obj(t).text||'').trim();}).length;
+  var taskBody=taskHTML(0)+taskHTML(1)+taskHTML(2)+
+    (filled<3?'<p class="muted small" style="margin-top:8px">还有 '+(3-filled)+' 件没写文字，去后台补上，勾起来更清楚。</p>':'');
+  var g=firstGoal();
+  var goalTarget=g?('editor-'+g.id):'sec-content';
+  var sc=state.boards.filter(function(b){return b.type==='schedule';})[0];
+  var scTarget=sc?('editor-'+sc.id):'sec-boards';
+  var blankHint=state.boards.length?'':
+    '<section class="card"><div class="card-head"><h2 class="serif">工作台还是空的</h2></div>'+
+    '<div class="empty-state"><p>还没有任何板块。去后台「板块管理」添加第一个板块，它就会出现在导航里。</p>'+
+    '<button class="btn btn-soft btn-sm" type="button" data-action="go-admin" data-target="sec-boards">去后台添加板块 →</button></div></section>';
+  return blankHint+'<div class="grid-2">'+
+    '<section class="card greeting-card"><div class="card-head"><h2 class="serif">今天</h2></div>'+
+      '<p class="greeting-line">'+greet+(name?'，'+name:'')+'。</p>'+
+      (school?'<p class="greeting-sub">'+school+'</p>':'')+
+      '<p class="greeting-sub">慢慢来，先看看下面这几块。</p></section>'+
+    '<section class="card"><div class="card-head"><h2 class="serif">连续打卡</h2>'+
+      '<span class="card-note">当天完成任意一个习惯算一天</span></div>'+
+      '<div class="stat-num">'+streakDays()+'<span class="unit">天</span></div>'+
+      '<p class="stat-label">去「天天打卡」点今天的格子，这里就会变。</p></section>'+
+  '</div>'+
+  '<section class="card"><div class="card-head"><h2 class="serif">今天最重要的三件事</h2>'+
+    '<span class="card-note">勾选按日期记录，第二天自动重置</span></div>'+
+    taskBody+
+    '<div class="card-actions"><button class="btn btn-soft btn-sm" type="button" data-action="go-admin" data-target="sec-overview">去后台填写这三件事 →</button></div></section>'+
+  '<section class="card"><div class="card-head"><h2 class="serif">下一个任务倒计时</h2>'+
+    '<span class="card-note">所有日程里最近的一件 · 做完的不算</span></div>'+taskCountdownHTML()+
+    '<div class="card-actions"><button class="btn btn-soft btn-sm" type="button" data-action="go-admin" data-target="'+esc(scTarget)+'">去后台改任务日期 →</button></div></section>'+
+  '<div class="grid-2">'+
+    '<section class="card"><div class="card-head"><h2 class="serif">目标进度本 · 倒计时</h2>'+
+      '<span class="card-note">第一个目标冲刺板块</span></div>'+countdownHTML()+
+      '<div class="card-actions"><button class="btn btn-soft btn-sm" type="button" data-action="go-admin" data-target="'+esc(goalTarget)+'">去后台改目标 / 日期 →</button></div></section>'+
+    '<section class="card"><div class="card-head"><h2 class="serif">未来 7 天要做的事</h2>'+
+      '<span class="card-note">明天起，按日期排 · 已完成的不算</span></div>'+futureHTML()+'</section>'+
+  '</div>';
+}
+
+/* ============ 前台：三种积木 ============ */
+function goalHTML(b){
+  var d=obj(b.data);
+  var prog=arr(d.progress).map(function(p){
+    p=obj(p);var n=Math.max(0,Math.min(100,Number(p.percent)||0));
+    return '<div class="prog-item"><div class="prog-top"><span class="prog-name">'+esc(p.name||'未命名')+'</span>'+
+      '<span class="prog-pct">'+n+'%</span></div>'+
+      '<div class="prog-track" role="progressbar" aria-valuenow="'+n+'" aria-valuemin="0" aria-valuemax="100" aria-label="'+esc(p.name||'进度')+' 进度">'+
+      '<span style="width:'+n+'%"></span></div>'+
+      (p.note?'<p class="prog-note">'+esc(p.note)+'</p>':'')+'</div>';
+  }).join('');
+  var notes=arr(d.notes).slice().sort(function(a,c){return String(obj(c).date||'').localeCompare(String(obj(a).date||''));});
+  var noteHTML=notes.length?notes.map(function(n){
+    n=obj(n);
+    return '<article class="note"><div class="note-date">'+fmtCN(n.date)+'</div><p>'+esc(n.text||'').replace(/\n/g,'<br>')+'</p></article>';
+  }).join(''):'<p class="empty-hint">本子还是空的。</p>';
+  var gap=d.date?daysBetween(todayStr(),d.date):null;
+  var cd=gap===null?'':'　·　'+(gap>0?'还有 '+gap+' 天':gap===0?'就是今天':'已过去 '+(-gap)+' 天');
+  return '<section class="card"><div class="card-head"><h2 class="serif">'+esc(d.title||'未命名目标')+'</h2>'+
+    '<span class="card-note">'+fmtCN(d.date)+cd+'</span></div>'+
+    '<p class="muted">文字、日期、百分比都在后台改。</p></section>'+
+    '<section class="card"><div class="card-head"><h2 class="serif">进度</h2><span class="card-note">共 '+arr(d.progress).length+' 项</span></div>'+
+    (prog||'<p class="empty-hint">还没有进度项。</p>')+'</section>'+
+    '<section class="card"><div class="card-head"><h2 class="serif">本子</h2><span class="card-note">按日期记笔记</span></div>'+
+    noteHTML+'<div class="card-actions"><button class="btn btn-soft btn-sm" type="button" data-action="go-admin" data-target="editor-'+esc(b.id)+'">去后台记一笔 →</button></div></section>';
+}
+function scheduleHTML(b){
+  var d=obj(b.data);
+  var today=todayStr();
+  var items=arr(d.items).map(function(it,i){return {it:obj(it),i:i};}).sort(function(a,c){
+    if(!a.it.date&&!c.it.date)return a.i-c.i;
+    if(!a.it.date)return 1;
+    if(!c.it.date)return -1;
+    return a.it.date.localeCompare(c.it.date);
+  });
+  var undated=items.filter(function(x){return !x.it.date;}).length;
+  var splitDone=false;
+  var rows=items.length?items.map(function(x){
+    var it=x.it;
+    var pre='';
+    if(!it.date&&!splitDone){pre='<li class="sched-split">以下 '+undated+' 件还没填日期</li>';splitDone=true;}
+    var past=it.date&&it.date<today;
+    return pre+'<li class="sched-row'+(it.done?' is-done':'')+'">'+
+      '<input class="sched-check" type="checkbox" data-action="toggle-item" data-board="'+esc(b.id)+'"'+
+        ' data-item="'+esc(it.id||'')+'" data-j="'+x.i+'"'+(it.done?' checked':'')+
+        ' aria-label="标记「'+esc(it.thing||'未命名')+'」完成">'+
+      '<span class="sched-thing">'+esc(it.thing||'未命名')+dayTag(it.date)+'</span>'+
+      '<span class="chip">'+esc(it.type||'未分类')+'</span>'+
+      '<span class="sched-date'+(it.date?'':' is-tbd')+(past?' is-past':'')+'">'+
+        fmtCN(it.date)+(past?' · 已过':'')+'</span></li>';
+  }).join(''):'<p class="empty-hint">还没有日程，去后台添加。</p>';
+  return '<section class="card"><div class="card-head"><h2 class="serif">'+esc(b.name||'日程清单')+'</h2>'+
+    '<span class="card-note">共 '+items.length+' 件 · 按日期排 · 点方框勾完成 · 日期在最后</span></div>'+
+    '<ul class="sched-list">'+rows+'</ul>'+
+    '<div class="card-actions"><button class="btn btn-soft btn-sm" type="button" data-action="go-admin" data-target="editor-'+esc(b.id)+'">去后台增删 / 改日期 →</button></div></section>';
+}
+function habitRange(d){
+  var p=Number(d.pastDays),f=Number(d.futureDays);
+  if(!isFinite(p))p=90;
+  if(!isFinite(f))f=30;
+  return {past:Math.max(7,Math.min(365,Math.round(p))),future:Math.max(0,Math.min(365,Math.round(f)))};
+}
+function recent30(today){var a=[];for(var i=29;i>=0;i--)a.push(addDays(today,-i));return a;}
+function habitHTML(b){
+  var d=obj(b.data),today=todayStr(),rg=habitRange(d);
+  var days=[],i;
+  for(i=rg.past;i>=0;i--)days.push(addDays(today,-i));
+  for(i=1;i<=rg.future;i++)days.push(addDays(today,i));
+  var lastMon='';
+  var heads=days.map(function(day){
+    var mon=day.slice(0,7),flag=mon!==lastMon;
+    lastMon=mon;
+    var wd=new Date(day+'T00:00:00').getDay();
+    return '<div class="tl-date'+(day===today?' is-today':'')+(day>today?' is-future':'')+'" data-day="'+day+'">'+
+      '<span class="tl-mon">'+(flag?Number(mon.slice(5))+'月':'')+'</span>'+
+      '<span class="tl-w">'+'日一二三四五六'.charAt(wd)+'</span></div>';
+  }).join('');
+  var recent=recent30(today);
+  var rows=arr(d.habits).map(function(h){
+    h=obj(h);var r=obj(h.records);
+    var cells=days.map(function(day){
+      var done=!!r[day],isToday=day===today,isFuture=day>today,first=day.slice(8)==='01';
+      return '<button type="button" class="tl-cell'+(done?' done':'')+(isToday?' today':'')+
+        (isFuture?' future':'')+(first?' month-start':'')+'"'+
+        ' data-action="toggle-habit" data-board="'+esc(b.id)+'" data-habit="'+esc(h.id)+'" data-date="'+day+'"'+
+        (isFuture?' disabled':'')+' aria-pressed="'+done+'"'+
+        ' aria-label="'+fmtCN(day)+' '+(done?'已打卡':'未打卡')+(isFuture?'，未来只能看':isToday?'，今天可点击':'，可补打卡')+'"'+
+        ' title="'+fmtCN(day)+(done?' ✓ 已打卡':isFuture?'（未来）':'（可补打卡）')+'">'+
+        (done?'✓':Number(day.slice(8)))+'</button>';
+    }).join('');
+    var total=Object.keys(r).filter(function(k){return r[k];}).length;
+    var rn=recent.filter(function(k){return r[k];}).length;
+    return '<div class="tl-row"><div class="tl-name">'+
+      '<span class="nm">'+esc(h.name||'未命名习惯')+'</span>'+
+      '<span class="sub"><span class="habit-count">共打卡 '+total+' 天</span>'+
+      ' · <span class="tl-month-count">最近 30 天 '+rn+' 天</span>'+
+      (h.note?' · '+esc(h.note):'')+'</span></div>'+
+      '<div class="tl-track" role="group" aria-label="'+esc(h.name||'习惯')+' 打卡时间轴">'+cells+'</div></div>';
+  }).join('');
+  var toolbar='<div class="tl-toolbar">'+
+    '<button class="btn btn-soft btn-sm" type="button" data-action="tl-jump" data-board="'+esc(b.id)+'" data-to="prev">← 往前一周</button>'+
+    '<button class="btn btn-soft btn-sm" type="button" data-action="tl-jump" data-board="'+esc(b.id)+'" data-to="month">最近一个月</button>'+
+    '<button class="btn btn-soft btn-sm" type="button" data-action="tl-jump" data-board="'+esc(b.id)+'" data-to="today">回到今天</button>'+
+    '<button class="btn btn-soft btn-sm" type="button" data-action="tl-jump" data-board="'+esc(b.id)+'" data-to="future">看未来 →</button>'+
+    '<button class="btn btn-soft btn-sm" type="button" data-action="tl-jump" data-board="'+esc(b.id)+'" data-to="next">往后一周 →</button>'+
+    '</div>';
+  var grid=rows?'<div class="tl-scroll" id="tl-'+esc(b.id)+'" data-month-day="'+addDays(today,-29)+'"'+
+      ' data-today-day="'+today+'" tabindex="0" aria-label="打卡时间轴，可左右滚动">'+
+      '<div class="tl-inner"><div class="tl-row"><div class="tl-name tl-name-head">习惯 / 日期</div>'+
+      '<div class="tl-track">'+heads+'</div></div>'+rows+'</div></div>':
+      '<p class="empty-hint">还没有习惯，去后台添加。</p>';
+  return '<section class="card"><div class="card-head"><h2 class="serif">'+esc(b.name||'打卡')+'</h2>'+
+    '<span class="card-note">连续时间轴 · 过去 '+rg.past+' 天 + 今天 + 未来 '+rg.future+' 天</span></div>'+
+    toolbar+grid+
+    '<div class="tl-legend"><span><i class="sw" style="background:var(--blue-700)"></i>已打卡</span>'+
+      '<span><i class="sw" style="background:var(--blue-50)"></i>未打卡（可补）</span>'+
+      '<span><i class="sw" style="background:#fff"></i>未来（只能看）</span></div>'+
+    '<p class="muted small" style="margin-top:8px">左右滑动看过去和未来；今天、过去都能点（补打卡或取消），未来不能点。'+
+      '跨度在后台「板块内容 → 天天打卡」里改。</p>'+
+    '<div class="card-actions"><button class="btn btn-soft btn-sm" type="button" data-action="go-admin" data-target="editor-'+esc(b.id)+'">去后台改时间跨度 →</button></div></section>';
+}
+function money(v){return '¥'+(Math.round((Number(v)||0)*100)/100);}
+function ledgerHTML(b){
+  var d=obj(b.data);
+  var month=todayStr().slice(0,7);
+  var entries=arr(d.entries).map(function(e){return obj(e);});
+  var cur=entries.filter(function(e){return String(e.date||'').slice(0,7)===month;});
+  var inc=0,out=0;
+  cur.forEach(function(e){
+    var v=Number(e.amount)||0;
+    if(e.kind==='in')inc+=v;else out+=v;
+  });
+  var min=Number(d.incomeMin)||0,max=Number(d.incomeMax)||0;
+  var goal=max||min;
+  var pct=goal?Math.max(0,Math.min(100,Math.round(inc/goal*100))):0;
+  var budget=Number(d.monthBudget)||0,food=Number(d.foodBudget)||0;
+  var goalTxt=(min||max)?('¥'+min+' – ¥'+max):'还没填';
+  var sorted=entries.slice().sort(function(a,c){return String(c.date||'').localeCompare(String(a.date||''));});
+  var rows=sorted.length?sorted.map(function(e){
+    var isIn=e.kind==='in';
+    return '<li class="ledger-row"><span class="l-thing">'+esc(e.thing||'未命名')+'</span>'+
+      '<span class="chip">'+esc(e.type||(isIn?'收入':'支出'))+'</span>'+
+      '<span class="l-amt '+(isIn?'money-in':'money-out')+'">'+(isIn?'+':'−')+money(e.amount)+'</span>'+
+      '<span class="l-date">'+fmtCN(e.date)+'</span></li>';
+  }).join(''):'<p class="empty-hint">还没有记过账。去后台「记一笔」，这里会自动算收支。</p>';
+  var head='<section class="card"><div class="card-head"><h2 class="serif">'+esc(b.name||'账本')+'</h2>'+
+    '<span class="card-note">本月 · '+Number(month.slice(0,4))+' 年 '+Number(month.slice(5))+' 月</span></div>'+
+    '<div class="money-grid">'+
+      '<div class="money-cell"><div class="k">本月收入</div><div class="v money-in">'+money(inc)+'</div></div>'+
+      '<div class="money-cell"><div class="k">本月支出</div><div class="v money-out">'+money(out)+'</div></div>'+
+      '<div class="money-cell"><div class="k">本月结余</div><div class="v">'+money(inc-out)+'</div></div>'+
+    '</div>'+
+    '<div class="prog-top"><span class="prog-name">月收入目标 '+esc(goalTxt)+'</span>'+
+      '<span class="prog-pct">'+pct+'%</span></div>'+
+    '<div class="prog-track" role="progressbar" aria-valuenow="'+pct+'" aria-valuemin="0" aria-valuemax="100" aria-label="月收入目标进度">'+
+      '<span style="width:'+pct+'%"></span></div>'+
+    '<p class="muted small" style="margin-top:8px">每月生活费预算 '+money(budget)+'，其中伙食费约 '+money(food)+'。'+
+      (d.note?'<br>'+esc(d.note):'')+'</p></section>';
+  return head+'<section class="card"><div class="card-head"><h2 class="serif">流水</h2>'+
+    '<span class="card-note">共 '+entries.length+' 笔 · 日期在最后</span></div>'+
+    '<ul class="list-plain">'+rows+'</ul>'+
+    '<div class="card-actions"><button class="btn btn-soft btn-sm" type="button" data-action="go-admin" data-target="editor-'+esc(b.id)+'">去后台记一笔 →</button></div></section>';
+}
+function tlJump(c,to,smooth){
+  var behavior=smooth?'smooth':'auto';
+  if(to==='prev'||to==='next'){
+    var delta=(to==='next'?1:-1)*7*34;
+    try{c.scrollBy({left:delta,behavior:behavior});}catch(e){c.scrollLeft+=delta;}
+    return;
+  }
+  var day=to==='month'?c.dataset.monthDay:c.dataset.todayDay;
+  var cell=c.querySelector('.tl-date[data-day="'+day+'"]');
+  if(!cell)return;
+  var left=to==='today'?(cell.offsetLeft-c.clientWidth/2+75):(cell.offsetLeft-160);
+  left=Math.max(0,left);
+  try{c.scrollTo({left:left,behavior:behavior});}catch(e){c.scrollLeft=left;}
+}
+function positionTimelines(){
+  var list=document.querySelectorAll('.tl-scroll');
+  for(var i=0;i<list.length;i++){
+    var c=list[i];
+    if(!c.clientWidth)continue; /* 前台被隐藏时不算位置 */
+    if(tlPos[c.id]!=null)c.scrollLeft=tlPos[c.id];
+    else{tlJump(c,'month',false);tlPos[c.id]=c.scrollLeft;}
+  }
+}
+function renderFront(){
+  var el=document.getElementById('frontView'),html='';
+  if(currentView==='overview')html=overviewHTML();
+  else{
+    var b=state.boards.filter(function(x){return 'board:'+x.id===currentView;})[0];
+    if(!b)html='<section class="card"><p class="empty-hint">这个板块已经不在了，回总览看看，或去后台添加板块。</p></section>';
+    else html=b.type==='goal'?goalHTML(b):b.type==='schedule'?scheduleHTML(b):b.type==='habit'?habitHTML(b):b.type==='ledger'?ledgerHTML(b):'';
+  }
+  el.innerHTML=html;
+  positionTimelines();
+}
+
+/* ============ 后台 ============ */
+function inputField(label,path,value,type,extra){
+  extra=extra||{};
+  var num=type==='number';
+  return '<label class="field'+(extra.wide?' wide':'')+'"><span>'+esc(label)+'</span>'+
+    '<input type="'+(type||'text')+'" data-path="'+esc(path)+'"'+(extra.navSync?' data-nav-sync="1"':'')+
+    ' value="'+esc(value==null?'':value)+'"'+
+    (num?' min="'+(extra.min!=null?extra.min:0)+'"'+(extra.max!=null?' max="'+extra.max+'"':'')+
+      ' step="'+(extra.step||1)+'"':'')+'></label>';
+}
+function basicSection(){
+  var opts=[{v:'overview',t:'总览'}].concat(state.boards.map(function(b){return {v:'board:'+b.id,t:b.name||'未命名板块'};}));
+  var sel='<label class="field"><span>默认打开页</span><select data-path="settings.startPage">'+
+    opts.map(function(o){return '<option value="'+esc(o.v)+'"'+(state.settings.startPage===o.v?' selected':'')+'>'+esc(o.t)+'</option>';}).join('')+
+    '</select></label>';
+  return '<section class="card admin-card" id="sec-basic"><div class="card-head"><h2 class="serif">基本设置</h2>'+
+    '<span class="card-note">改完立刻自动保存</span></div><div class="form-grid">'+
+    inputField('姓名','profile.name',state.profile.name)+inputField('页面标题','profile.siteTitle',state.profile.siteTitle)+
+    inputField('身份 / 一句话','profile.school',state.profile.school,'text',{wide:true})+sel+'</div></section>';
+}
+function boardsSection(){
+  var rows=state.boards.map(function(b,i){
+    var opts=Object.keys(TYPES).map(function(k){
+      return '<option value="'+k+'"'+(b.type===k?' selected':'')+'>'+TYPES[k]+'</option>';
+    }).join('');
+    return '<div class="board-row"><span class="board-no">'+i+1+'</span>'+
+      inputField('板块名','boards.'+i+'.name',b.name,'text',{navSync:true})+
+      '<label class="field"><span class="sr-only">积木类型</span><select data-action="change-type" data-i="'+i+'">'+opts+'</select></label>'+
+      '<div class="row-btns">'+
+        '<button type="button" data-action="move-board" data-i="'+i+'" data-dir="-1"'+(i===0?' disabled':'')+' aria-label="上移 '+esc(b.name)+'">↑</button>'+
+        '<button type="button" data-action="move-board" data-i="'+i+'" data-dir="1"'+(i===state.boards.length-1?' disabled':'')+' aria-label="下移 '+esc(b.name)+'">↓</button>'+
+        '<button type="button" class="danger" data-action="del-board" data-i="'+i+'" aria-label="删除 '+esc(b.name)+'">×</button>'+
+      '</div></div>';
+  }).join('');
+  var addOpts=Object.keys(TYPES).map(function(k){return '<option value="'+k+'">'+TYPES[k]+'</option>';}).join('');
+  return '<section class="card admin-card" id="sec-boards"><div class="card-head"><h2 class="serif">板块管理</h2>'+
+    '<span class="card-note">改名 · 换积木 · 调顺序 · 删除</span></div>'+
+    (rows?'<div class="board-list">'+rows+'</div>':'<p class="empty-hint">一个板块都没有，下面添加一个。</p>')+
+    '<div class="add-row"><input type="text" id="newBoardName" placeholder="新板块的名字" aria-label="新板块名字">'+
+    '<select id="newBoardType" aria-label="新板块积木">'+addOpts+'</select>'+
+    '<button class="btn btn-primary" type="button" data-action="add-board">＋ 添加板块</button></div>'+
+    '<p class="muted small" style="margin-top:10px">换积木时旧内容会留档，切回原来的积木能找回来。</p></section>';
+}
+function goalEditor(b,i){
+  var d=obj(b.data),base='boards.'+i+'.data';
+  var rows=arr(d.progress).map(function(p,j){
+    p=obj(p);
+    return '<div class="edit-row goal-row">'+
+      '<input type="text" aria-label="进度名称" placeholder="名称" data-path="'+base+'.progress.'+j+'.name" value="'+esc(p.name)+'">'+
+      '<input type="number" min="0" max="100" step="1" aria-label="百分比" data-path="'+base+'.progress.'+j+'.percent" value="'+(Number(p.percent)||0)+'">'+
+      '<input type="text" aria-label="一句说明" placeholder="一句说明" data-path="'+base+'.progress.'+j+'.note" value="'+esc(p.note)+'">'+
+      '<button type="button" class="danger" data-action="del-progress" data-i="'+i+'" data-j="'+j+'" aria-label="删除这条进度">×</button></div>';
+  }).join('');
+  var notes=arr(d.notes).map(function(n,j){
+    n=obj(n);
+    return '<div class="edit-row note-row">'+
+      '<input type="date" aria-label="笔记日期" data-path="'+base+'.notes.'+j+'.date" value="'+esc(n.date)+'">'+
+      '<textarea rows="2" aria-label="笔记内容" placeholder="写点什么…" data-path="'+base+'.notes.'+j+'.text">'+esc(n.text)+'</textarea>'+
+      '<button type="button" class="danger" data-action="del-note" data-i="'+i+'" data-j="'+j+'" aria-label="删除这条笔记">×</button></div>';
+  }).join('');
+  return '<div class="form-grid">'+
+    inputField('目标名称',base+'.title',d.title,'text',{wide:true})+
+    inputField('目标日期（留空＝日期待定）',base+'.date',d.date,'date')+'</div>'+
+    '<h4 class="sub serif">进度项</h4>'+(rows?'<div class="edit-list">'+rows+'</div>':'<p class="muted">还没有进度项。</p>')+
+    '<button class="btn btn-soft btn-sm" type="button" data-action="add-progress" data-i="'+i+'">＋ 添加进度</button>'+
+    '<h4 class="sub serif">本子（按日期记笔记）</h4>'+(notes?'<div class="edit-list">'+notes+'</div>':'<p class="muted">本子还是空的。</p>')+
+    '<button class="btn btn-soft btn-sm" type="button" data-action="add-note" data-i="'+i+'">＋ 记一笔（日期默认今天）</button>';
+}
+function scheduleEditor(b,i){
+  var d=obj(b.data),base='boards.'+i+'.data';
+  var types=arr(d.types).length?arr(d.types):['未分类'];
+  var rows=arr(d.items).map(function(it,j){
+    it=obj(it);
+    var opts=types.slice();
+    if(it.type&&opts.indexOf(it.type)<0)opts.push(it.type);
+    return '<div class="edit-row sched-edit">'+
+      '<input type="text" aria-label="事情" placeholder="事情" data-path="'+base+'.items.'+j+'.thing" value="'+esc(it.thing)+'">'+
+      '<select aria-label="类型" data-path="'+base+'.items.'+j+'.type">'+opts.map(function(t){
+        return '<option value="'+esc(t)+'"'+(t===it.type?' selected':'')+'>'+esc(t)+'</option>';}).join('')+'</select>'+
+      '<input type="date" aria-label="日期" data-path="'+base+'.items.'+j+'.date" value="'+esc(it.date)+'">'+
+      '<button type="button" class="danger" data-action="del-item" data-i="'+i+'" data-j="'+j+'" aria-label="删除这条日程">×</button></div>';
+  }).join('');
+  return '<label class="field wide"><span>类型词（用逗号隔开）</span>'+
+    '<input type="text" data-action="edit-types" data-i="'+i+'" value="'+esc(types.join('，'))+'" aria-label="类型词"></label>'+
+    '<h4 class="sub serif">日程条目</h4><p class="muted small">前台按日期排好，顺序是「事情 · 类型 · 日期」，日期在最后；每条前面有勾选框，做完在前台点一下就划线，也不再进总览倒计时。</p>'+
+    (rows?'<div class="edit-list" style="margin-top:10px">'+rows+'</div>':'<p class="muted">还没有日程。</p>')+
+    '<button class="btn btn-soft btn-sm" type="button" data-action="add-item" data-i="'+i+'">＋ 添加一条</button>';
+}
+function habitEditor(b,i){
+  var d=obj(b.data),base='boards.'+i+'.data';
+  var rows=arr(d.habits).map(function(h,j){
+    h=obj(h);
+    return '<div class="edit-row habit-edit">'+
+      '<input type="text" aria-label="习惯名称" placeholder="习惯名称" data-path="'+base+'.habits.'+j+'.name" value="'+esc(h.name)+'">'+
+      '<input type="text" aria-label="备注" placeholder="备注（可留空）" data-path="'+base+'.habits.'+j+'.note" value="'+esc(h.note)+'">'+
+      '<button type="button" class="btn-mini" data-action="clear-records" data-i="'+i+'" data-j="'+j+'" title="清空这个习惯的打卡记录">清记录</button>'+
+      '<button type="button" class="danger" data-action="del-habit" data-i="'+i+'" data-j="'+j+'" aria-label="删除这个习惯">×</button></div>';
+  }).join('');
+  return '<div class="form-grid">'+
+    inputField('能看到过去多少天（7–365）',base+'.pastDays',d.pastDays==null?90:d.pastDays,'number',{min:7,max:365})+
+    inputField('能看到未来多少天（0–365）',base+'.futureDays',d.futureDays==null?30:d.futureDays,'number',{min:0,max:365})+
+    '</div>'+
+    '<h4 class="sub serif">习惯</h4>'+(rows?'<div class="edit-list">'+rows+'</div>':'<p class="muted">还没有习惯。</p>')+
+    '<button class="btn btn-soft btn-sm" type="button" data-action="add-habit" data-i="'+i+'">＋ 添加习惯</button>'+
+    '<p class="muted small" style="margin-top:10px">前台是一条可以左右滑动的连续时间轴：今天和过去都能点（补打卡或取消），未来只能看；「最近一个月」按钮跳到最近 30 天的起点。上面两个数字决定时间轴有多长。</p>';
+}
+function ledgerEditor(b,i){
+  var d=obj(b.data),base='boards.'+i+'.data';
+  var rows=arr(d.entries).map(function(e,j){
+    e=obj(e);
+    return '<div class="edit-row ledger-edit">'+
+      '<input type="date" aria-label="日期" data-path="'+base+'.entries.'+j+'.date" value="'+esc(e.date)+'">'+
+      '<input type="text" aria-label="事项" placeholder="事项" data-path="'+base+'.entries.'+j+'.thing" value="'+esc(e.thing)+'">'+
+      '<select aria-label="收支" data-path="'+base+'.entries.'+j+'.kind">'+
+        '<option value="out"'+(e.kind!=='in'?' selected':'')+'>支出</option>'+
+        '<option value="in"'+(e.kind==='in'?' selected':'')+'>收入</option></select>'+
+      '<input type="number" min="0" step="0.01" aria-label="金额" placeholder="金额" data-path="'+base+'.entries.'+j+'.amount" value="'+esc(e.amount)+'">'+
+      '<button type="button" class="danger" data-action="del-entry" data-i="'+i+'" data-j="'+j+'" aria-label="删除这笔">×</button></div>';
+  }).join('');
+  return '<div class="form-grid">'+
+    inputField('每月生活费预算（元）',base+'.monthBudget',d.monthBudget,'number',{step:'0.01'})+
+    inputField('其中伙食费（元）',base+'.foodBudget',d.foodBudget,'number',{step:'0.01'})+
+    inputField('月收入目标下限（元）',base+'.incomeMin',d.incomeMin,'number',{step:'0.01'})+
+    inputField('月收入目标上限（元）',base+'.incomeMax',d.incomeMax,'number',{step:'0.01'})+
+    inputField('备注 / 一句话',base+'.note',d.note,'text',{wide:true})+'</div>'+
+    '<h4 class="sub serif">流水</h4>'+
+    '<p class="muted small">记一笔就自动算进本月收入 / 支出；前台按日期倒序显示，日期在最后。</p>'+
+    (rows?'<div class="edit-list" style="margin-top:10px">'+rows+'</div>':'<p class="muted">还没有流水。</p>')+
+    '<button class="btn btn-soft btn-sm" type="button" data-action="add-entry" data-i="'+i+'">＋ 记一笔（日期默认今天）</button>';
+}
+function contentSection(){
+  var editors=state.boards.map(function(b,i){
+    var body=b.type==='goal'?goalEditor(b,i):b.type==='schedule'?scheduleEditor(b,i):
+      b.type==='habit'?habitEditor(b,i):b.type==='ledger'?ledgerEditor(b,i):'<p class="muted">未知积木。</p>';
+    return '<div class="editor" id="editor-'+esc(b.id)+'"><div class="editor-head"><h3 class="serif">'+(i+1)+'. '+esc(b.name||'未命名板块')+'</h3>'+
+      '<span class="chip">'+esc(TYPES[b.type]||'未知积木')+'</span></div>'+body+'</div>';
+  }).join('');
+  return '<section class="card admin-card" id="sec-content"><div class="card-head"><h2 class="serif">板块内容</h2>'+
+    '<span class="card-note">每个板块填什么，由它的积木决定</span></div>'+
+    (editors||'<p class="empty-hint">还没有板块，先在上面「板块管理」里添加一个。</p>')+'</section>';
+}
+function overviewSection(){
+  var rows=[0,1,2].map(function(k){
+    var t=arr(state.overview.topThree)[k]||{text:''};
+    return inputField('第 '+(k+1)+' 件','overview.topThree.'+k+'.text',t.text,'text',{wide:true});
+  }).join('');
+  return '<section class="card admin-card" id="sec-overview"><div class="card-head"><h2 class="serif">总览设置</h2>'+
+    '<span class="card-note">今天最重要的三件事</span></div><div class="form-grid">'+rows+'</div>'+
+    '<button class="btn btn-soft btn-sm" type="button" data-action="reset-tasks" style="margin-top:14px">重置今天的勾选</button>'+
+    '<p class="muted small" style="margin-top:10px">前台三个勾选框一直都在，留空也能勾、也会存。留空时显示「第 N 件事（还没填，去后台写）」。勾选按日期记录，第二天自动变回未勾选。</p></section>';
+}
+function currentFileLabel(){
+  try{
+    var p=decodeURIComponent(location.pathname||'').replace(/\\/g,'/').split('/').filter(Boolean);
+    return esc(p.slice(-2).join(' / ')||'这个文件');
+  }catch(e){return '这个文件';}
+}
+function dataSection(){
+  var meta=readMeta();
+  var days=meta.lastBackupAt?Math.floor((Date.now()-Number(meta.lastBackupAt))/86400000):9999;
+  var fileBtns;
+  if(fileHandle||storageInfo.fileName){
+    fileBtns=(storageInfo.fileNeedGrant?'<button class="btn btn-primary" type="button" data-action="reconnect-file">重新连接数据文件</button>':'')+
+      '<button class="btn btn-soft" type="button" data-action="sync-now">立即同步一次</button>'+
+      '<button class="btn btn-danger-ghost" type="button" data-action="unbind-file">解除数据文件</button>';
+  }else{
+    fileBtns=(typeof window.showSaveFilePicker==='function')?
+      '<button class="btn btn-primary" type="button" data-action="bind-file">绑定数据文件（推荐）</button>':
+      '<p class="muted small">这个浏览器不支持自动文件同步，请定期用「备份」下载 .json 保存。</p>';
+  }
+  return '<section class="card admin-card" id="sec-data"><div class="card-head"><h2 class="serif">数据管理</h2>'+
+    '<span class="card-note">改动自动保存 · 三层保险</span></div>'+
+    '<div class="data-status" id="dataStatus">'+statusHTML()+'</div>'+
+    (days>7?'<div class="notice">'+(days>3650?'你还没下载过备份':'已经 '+days+' 天没下载备份了')+
+      '。建议现在点一下「备份」，留一份 .json 文件更保险。</div>':'')+
+    '<div class="data-btns">'+
+      '<button class="btn btn-primary" type="button" data-action="backup">↓ 备份（下载文件）</button>'+
+      '<button class="btn btn-soft" type="button" data-action="restore">↑ 恢复（选择备份文件）</button>'+
+      '<button class="btn btn-danger-ghost" type="button" data-action="clear">清空所有数据</button></div>'+
+    '<div class="data-btns">'+fileBtns+'</div>'+
+    '<div class="notice"><b>怎么保证以后打开都是你改好的内容</b><br>'+
+      '1. 固定用<b>同一个浏览器</b>打开这份文件（现在这份：'+currentFileLabel()+'），别用无痕模式、别清理浏览数据。同一个浏览器里换文件路径不会丢，但软件的「预览窗口」和你双击打开可能不是同一份存储。<br>'+
+      '2. 想彻底不受打开方式影响：点「绑定数据文件」选一个 .json，之后每次改动自动写进那个文件，打开时自动读回来；换电脑、换浏览器也能用「恢复」把它读回来。<br>'+
+      '3. 每次改动，右上角「已自动保存」的时间都会更新；万一变红显示「保存异常」，立刻点「备份」下载文件。</div>'+
+    '<p class="muted small">当前数据版本 v'+VERSION+' · 以后加新功能会保留已存内容，不会覆盖。备份文件是 .json，别用别的格式。</p></section>';
+}
+function renderAdmin(){
+  document.getElementById('adminView').innerHTML='<p class="admin-lead">这里填的内容会立刻自动保存，切回「前台」就能看到。不用碰任何代码。</p>'+
+    basicSection()+boardsSection()+contentSection()+overviewSection()+dataSection();
+}
+function rerenderAdminKeepScroll(){
+  var y=window.scrollY||window.pageYOffset||0;
+  renderAdmin();
+  window.scrollTo(0,y);
+}
+
+/* ============ 输入：即时保存，不重渲染（不丢焦点） ============ */
+function applyInput(el){
+  var path=el.dataset.path;
+  if(!path)return;
+  var v=el.value;
+  if(el.type==='number'){
+    v=Number(v)||0;
+    /* 只有百分比（max=100）才夹到 0–100，金额不能被截断 */
+    v=el.max==='100'?Math.max(0,Math.min(100,Math.round(v))):Math.max(0,Math.round(v*100)/100);
+  }
+  if(/\.(pastDays|futureDays)$/.test(path)){
+    v=Math.round(Number(v)||0);
+    v=path.indexOf('futureDays')>=0?Math.max(0,Math.min(365,v)):Math.max(7,Math.min(365,v));
+  }
+  setByPath(state,path,v);
+  save();
+  renderFront();
+  if(el.dataset.navSync){
+    renderNav();
+    if(currentView==='board:'+state.boards[Number(path.split('.')[1])].id){
+      document.getElementById('pageTitle').textContent=v||'未命名板块';
+    }
+  }
+  if(path==='profile.siteTitle'){
+    document.title=v||'我的大学工作台';
+    document.getElementById('brandTitle').textContent=v||'我的大学工作台';
+  }
+  if(path==='profile.school')document.getElementById('brandSub').textContent=v||'安静一点，慢慢来';
+}
+
+/* ============ 动作 ============ */
+function changeBoardType(i,newType){
+  var b=state.boards[i];
+  if(!b||b.type===newType||!TYPES[newType])return;
+  b.dataHistory=obj(b.dataHistory);
+  b.dataHistory[b.type]=clone(obj(b.data));
+  b.type=newType;
+  b.data=b.dataHistory[newType]?clone(b.dataHistory[newType]):emptyData(newType);
+  save();renderAll();
+  toast('已切换积木，旧内容留档，切回来能找回');
+}
+function updateTypes(i,value){
+  var b=state.boards[i];if(!b)return;
+  var list=value.split(/[,，、]/).map(function(s){return s.trim();}).filter(Boolean);
+  b.data=obj(b.data);
+  b.data.types=list.length?list:['未分类'];
+  save();rerenderAdminKeepScroll();
+  toast('类型词已更新');
+}
+function backup(){
+  try{
+    var payload={app:'我的大学工作台',schemaVersion:VERSION,exportedAt:new Date().toISOString(),state:state};
+    var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+    var url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='我的大学工作台-备份-'+todayStr()+'.json';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url);},1500);
+    var m=readMeta();m.lastBackupAt=Date.now();writeMeta(m);
+    toast('已下载备份：'+a.download);
+  }catch(e){toast('下载失败：'+e.message,'error');}
+}
+function handleRestoreFile(input){
+  var f=input.files&&input.files[0];
+  if(!f)return;
+  var reader=new FileReader();
+  reader.onload=function(){
+    var parsed;
+    try{parsed=JSON.parse(String(reader.result));}
+    catch(e){toast('这个文件不是有效的备份 JSON','error');input.value='';return;}
+    var raw=parsed&&parsed.state?parsed.state:parsed;
+    if(!raw||typeof raw!=='object'||!Array.isArray(raw.boards)){
+      toast('备份格式不对，没找到板块数据','error');input.value='';return;
+    }
+    openConfirm({
+      title:'恢复备份',
+      body:'会用备份里的全部内容<b>覆盖</b>当前工作台。当前数据会先自动下载一份备份，方便后悔。',
+      confirmText:'覆盖并恢复',danger:false,
+      onConfirm:function(){
+        backup();
+        state=migrate(raw);
+        save();
+        currentView='overview';
+        document.title=(state.profile&&state.profile.siteTitle)||'我的大学工作台';
+        document.getElementById('brandTitle').textContent=(state.profile&&state.profile.siteTitle)||'我的大学工作台';
+        document.getElementById('brandSub').textContent=(state.profile&&state.profile.school)||'安静一点，慢慢来';
+        renderAll();
+        toast('已恢复备份');
+      }
+    });
+    input.value='';
+  };
+  reader.onerror=function(){toast('读取文件失败','error');input.value='';};
+  reader.readAsText(f,'utf-8');
+}
+function handleAction(a,el,e){
+  var i=Number(el.dataset.i),j=Number(el.dataset.j),b,d,k;
+  switch(a){
+    case 'toggle-task':
+      k=Number(el.dataset.i);
+      var t=arr(state.overview.topThree)[k];
+      if(!t)return;
+      t.doneOn=el.checked?todayStr():'';
+      save();
+      var row=el.closest('.task-row');
+      if(row)row.querySelector('.task-text').classList.toggle('done',el.checked);
+      return;
+    case 'toggle-item':{
+      var ib=state.boards.filter(function(x){return x.id===el.dataset.board;})[0];
+      if(!ib)return;
+      var list=arr(obj(ib.data).items);
+      var item=list.filter(function(x){return x&&x.id&&x.id===el.dataset.item;})[0]||list[Number(el.dataset.j)];
+      if(!item)return;
+      item.done=!!el.checked;
+      save();
+      if(mode==='admin')renderAll();
+      else{
+        var srow=el.closest('.sched-row');
+        if(srow)srow.classList.toggle('is-done',item.done);
+      }
+      return;
+    }
+    case 'toggle-habit':
+      b=state.boards.filter(function(x){return x.id===el.dataset.board;})[0];
+      if(!b)return;
+      var h=arr(obj(b.data).habits).filter(function(x){return x.id===el.dataset.habit;})[0];
+      if(!h)return;
+      h.records=obj(h.records);
+      var date=el.dataset.date;
+      if(date>todayStr()){toast('未来的日子还不能打卡','error');return;}
+      if(h.records[date])delete h.records[date];else h.records[date]=true;
+      save();
+      var done=!!h.records[date];
+      el.classList.toggle('done',done);
+      el.textContent=done?'✓':Number(date.slice(8));
+      el.setAttribute('aria-pressed',String(done));
+      el.setAttribute('aria-label',fmtCN(date)+' '+(done?'已打卡':'未打卡')+
+        (date===todayStr()?'，今天':'，过去可补打卡'));
+      var hrow=el.closest('.tl-row')||el.closest('.habit');
+      if(hrow){
+        var c=Object.keys(h.records).filter(function(x){return h.records[x];}).length;
+        var cnt=hrow.querySelector('.habit-count');
+        if(cnt)cnt.textContent='共打卡 '+c+' 天';
+        var rn=recent30(todayStr()).filter(function(x){return h.records[x];}).length;
+        var mcnt=hrow.querySelector('.tl-month-count');
+        if(mcnt)mcnt.textContent='最近 30 天 '+rn+' 天';
+      }
+      return;
+    case 'tl-jump':{
+      var tc=document.getElementById('tl-'+el.dataset.board);
+      if(tc)tlJump(tc,el.dataset.to,true);
+      return;
+    }
+    case 'go-admin':setMode('admin',el.dataset.target);return;
+    case 'modal-cancel':closeModal();return;
+    case 'modal-confirm':{
+      var cb=modalConfirm;
+      var had=!document.getElementById('modalCheckRow').hidden;
+      var checked=document.getElementById('modalCheck').checked;
+      closeModal();
+      if(cb)cb(had?checked:undefined);
+      return;
+    }
+    case 'add-board':{
+      var name=document.getElementById('newBoardName').value.trim();
+      var type=document.getElementById('newBoardType').value;
+      if(!name){toast('先给新板块起个名字','error');document.getElementById('newBoardName').focus();return;}
+      state.boards.push(makeBoard(type,name));
+      save();renderAll();toast('已添加板块：'+name);
+      return;
+    }
+    case 'del-board':
+      b=state.boards[i];if(!b)return;
+      openConfirm({title:'删除板块',body:'确定删掉「<b>'+esc(b.name||'未命名板块')+'</b>」吗？里面的内容也会一起删掉。',
+        confirmText:'删除',onConfirm:function(){
+          state.boards.splice(i,1);
+          if(currentView==='board:'+b.id)currentView='overview';
+          save();renderAll();toast('已删除板块');
+        }});
+      return;
+    case 'move-board':{
+      var to=i+Number(el.dataset.dir);
+      if(to<0||to>=state.boards.length)return;
+      var tmp=state.boards[i];state.boards[i]=state.boards[to];state.boards[to]=tmp;
+      save();renderAll();return;
+    }
+    case 'add-progress':
+      b=state.boards[i];if(!b)return;b.data=obj(b.data);
+      b.data.progress=arr(b.data.progress);
+      b.data.progress.push({id:uid(),name:'',percent:0,note:''});
+      save();renderAll();return;
+    case 'del-progress':
+      b=state.boards[i];if(!b)return;
+      arr(obj(b.data).progress).splice(j,1);
+      save();renderAll();return;
+    case 'add-note':
+      b=state.boards[i];if(!b)return;b.data=obj(b.data);
+      b.data.notes=arr(b.data.notes);
+      b.data.notes.push({id:uid(),date:todayStr(),text:''});
+      save();renderAll();return;
+    case 'del-note':
+      b=state.boards[i];if(!b)return;
+      arr(obj(b.data).notes).splice(j,1);
+      save();renderAll();return;
+    case 'add-item':
+      b=state.boards[i];if(!b)return;b.data=obj(b.data);
+      b.data.items=arr(b.data.items);
+      b.data.items.push({id:uid(),date:'',thing:'',type:arr(b.data.types)[0]||'未分类'});
+      save();renderAll();return;
+    case 'del-item':
+      b=state.boards[i];if(!b)return;
+      arr(obj(b.data).items).splice(j,1);
+      save();renderAll();return;
+    case 'add-entry':
+      b=state.boards[i];if(!b)return;b.data=obj(b.data);
+      b.data.entries=arr(b.data.entries);
+      b.data.entries.push({id:uid(),date:todayStr(),thing:'',kind:'out',type:'',amount:0});
+      save();renderAll();return;
+    case 'del-entry':
+      b=state.boards[i];if(!b)return;
+      arr(obj(b.data).entries).splice(j,1);
+      save();renderAll();return;
+    case 'add-habit':
+      b=state.boards[i];if(!b)return;b.data=obj(b.data);
+      b.data.habits=arr(b.data.habits);
+      b.data.habits.push({id:uid(),name:'',note:'',records:{}});
+      save();renderAll();return;
+    case 'del-habit':
+      b=state.boards[i];if(!b)return;
+      arr(obj(b.data).habits).splice(j,1);
+      save();renderAll();return;
+    case 'clear-records':
+      b=state.boards[i];if(!b)return;
+      d=arr(obj(b.data).habits)[j];if(!d)return;
+      openConfirm({title:'清空打卡记录',body:'只清空「<b>'+esc(d.name||'这个习惯')+'</b>」的打卡记录，习惯本身保留。',
+        confirmText:'清空记录',onConfirm:function(){d.records={};save();renderAll();toast('打卡记录已清空');}});
+      return;
+    case 'reset-tasks':
+      arr(state.overview.topThree).forEach(function(t){t.doneOn='';});
+      save();renderFront();toast('已重置今天的勾选');return;
+    case 'bind-file':bindDataFile();return;
+    case 'unbind-file':unbindDataFile();return;
+    case 'reconnect-file':reconnectDataFile();return;
+    case 'sync-now':
+      syncFromBoundFile(false).then(function(ok){
+        if(ok)toast('已和数据文件同步');
+        else toast('同步失败：'+(storageInfo.fileError||'请检查文件是否还在'),'error');
+      });return;
+    case 'backup':backup();return;
+    case 'restore':document.getElementById('restoreFile').click();return;
+    case 'clear':
+      openConfirm({
+        title:'清空所有数据',
+        body:'会删掉所有板块、进度、笔记、日程、打卡记录和总览三件事。<b>不可撤销</b>，建议先点「备份」。',
+        confirmText:'确认清空',checkLabel:'同时恢复初始示范内容',
+        onConfirm:function(checked){
+          state=checked?defaultState():blankState();
+          save();currentView='overview';
+          document.title=state.profile.siteTitle||'我的大学工作台';
+          document.getElementById('brandTitle').textContent=state.profile.siteTitle||'我的大学工作台';
+          document.getElementById('brandSub').textContent=state.profile.school||'安静一点，慢慢来';
+          renderAll();
+          toast(checked?'已清空并恢复示范内容':'已清空，工作台现在是空白的');
+        }});
+      return;
+  }
+}
+
+/* ============ 事件绑定 ============ */
+/* 捕获阶段记录时间轴滚动位置，重绘后能恢复 */
+document.addEventListener('scroll',function(e){
+  var t=e.target;
+  if(t&&t.classList&&t.classList.contains('tl-scroll'))tlPos[t.id]=t.scrollLeft;
+},true);
+document.addEventListener('input',function(e){
+  var el=e.target.closest?e.target.closest('[data-path]'):null;
+  if(el)applyInput(el);
+});
+document.addEventListener('change',function(e){
+  var el=e.target;
+  if(el.id==='restoreFile'){handleRestoreFile(el);return;}
+  if(el.dataset&&el.dataset.action==='change-type'){changeBoardType(Number(el.dataset.i),el.value);return;}
+  if(el.dataset&&el.dataset.action==='edit-types'){updateTypes(Number(el.dataset.i),el.value);return;}
+  var p=el.closest?el.closest('[data-path]'):null;
+  if(p)applyInput(p);
+});
+document.addEventListener('click',function(e){
+  var el=e.target.closest?e.target.closest('[data-action]'):null;
+  if(el){handleAction(el.dataset.action,el,e);return;}
+  var nb=e.target.closest?e.target.closest('[data-nav]'):null;
+  if(nb){
+    var v=nb.dataset.nav;
+    if(v==='back'){setMode('front');return;}
+    if(v.indexOf('sec-')===0){
+      activeSection=v;
+      var sb=document.querySelector('.sidebar'),sl=sb?sb.scrollLeft:0;
+      renderNav();
+      if(sb)sb.scrollLeft=sl;
+      var target=document.getElementById(v);
+      if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+      return;
+    }
+    currentView=v;setMode('front');return;
+  }
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'&&!document.getElementById('modal').hidden)closeModal();
+});
+document.getElementById('modeBtn').addEventListener('click',function(){setMode(mode==='front'?'admin':'front');});
+document.getElementById('modeBtnTop').addEventListener('click',function(){setMode(mode==='front'?'admin':'front');});
+
+/* ============ 启动 ============ */
+var now=new Date();
+document.getElementById('todayLabel').textContent=fmtCN(todayStr(now))+' · '+WEEK[now.getDay()];
+document.title=(state.profile&&state.profile.siteTitle)||'我的大学工作台';
+document.getElementById('brandTitle').textContent=(state.profile&&state.profile.siteTitle)||'我的大学工作台';
+document.getElementById('brandSub').textContent=(state.profile&&state.profile.school)||'安静一点，慢慢来';
+setMode('front');
+renderSaveStatus();       /* 顶栏立刻显示：已保存 / 首次打开 / 保存异常 */
+bootRecovery();           /* 异步比对备用存档和数据文件，取最新的一份 */
+if(storageInfo.source==='demo'){
+  toast('第一次打开：现在显示的是示范内容，去后台改成你自己的，之后会自动保存');
+}
+
+/* 手机切后台 / 关页面前，把待写入的数据文件补写完 */
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='hidden')flushFile();
+});
+if(window.addEventListener)window.addEventListener('pagehide',flushFile);
+})();
+</script>
+</body>
+</html>
